@@ -1,5 +1,6 @@
 //Load the express module and create a new app with it.
 var express = require('express');
+var movieRouter = require('./module/moviesrouter');
 var app = express();
 
 //Parse the body of HTTP request and transform it to JSON.
@@ -8,21 +9,7 @@ app.use(bodyParser.json());
 
 //Now specify all the URL routings and add their handling
 /* -=- MOVIE RELATED ROUTINGS -=- */
-app.get('/api/movies', function (req, res) {
-   res.send('Returns a list of all movies!');
-});
-
-app.get('/api/movies/:tt_number', function (req, res) {
-    res.send('Returns the movie with that tt_number!');
-});
-
-app.get('/api/movies/:title', function (req, res) {
-    res.send('Returns a movie with that title!');
-});
-
-app.get('/api/movies/:director', function (req, res) {
-    res.send('Returns all movies with the given director!');
-});
+app.use('/api/users/', movieRouter);
 
 /* -=- USER RELATED ROUTINGS -=- */
 app.post('/api/users', function (req, res) {
