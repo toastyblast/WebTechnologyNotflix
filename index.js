@@ -1,7 +1,12 @@
 //Load the express module and create a new app with it.
 var express = require('express');
-var movieRouter = require('./module/moviesrouter');
+var mongoose = require('mongoose');
+var movieRouter = require('./module/moviesrouter.js');
+var ratingRouter = require('./module/ratingsrouter.js');
 var app = express();
+
+//Start the Mongoose connection.
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 
 //Parse the body of HTTP request and transform it to JSON.
 var bodyParser = require('body-parser');
@@ -12,17 +17,7 @@ app.use(bodyParser.json());
 app.use('/api/users/', movieRouter);
 
 /* -=- USER RELATED ROUTINGS -=- */
-app.post('/api/users', function (req, res) {
-    res.send('Creates a user with the sent data, if it is original!');
-});
-
-app.get('/api/users', function (req, res) {
-    res.send('Returns a list of all users, if the client requesting it is logged in!');
-});
-
-app.get('/api/users/:username', function (req, res) {
-    res.send('Returns the user with that specific username (without their password, of course)');
-});
+app.use('/api/ratings/', ratingRouter);
 
 /* -=- RATING RELATED ROUTINGS -=- */
 app.get('/api/ratings', function (req, res) {
