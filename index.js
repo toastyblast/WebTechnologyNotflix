@@ -14,35 +14,13 @@ app.use(bodyParser.json());
 
 //Now specify all the URL routings and add their handling
 /* -=- MOVIE RELATED ROUTINGS -=- */
-app.use('/api/users/', movieRouter);
+app.use('/api/movies/', movieRouter);
 
 /* -=- USER RELATED ROUTINGS -=- */
-app.use('/api/ratings/', ratingRouter);
+app.use('/api/users/', ratingRouter);
 
 /* -=- RATING RELATED ROUTINGS -=- */
-app.get('/api/ratings', function (req, res) {
-    res.send('Returns a list of all average ratings per movie');
-});
-
-app.post('/api/ratings', function (req, res) {
-    res.send('Creates a new rating if the client is logged in');
-});
-
-app.put('/api/ratings/:username&:tt_number', function (req, res) {
-    res.send('Updates the rating with that username and tt_number if the client is the one who posted said rating.');
-});
-
-app.delete('/api/ratings/:username&:tt_number', function (req, res) {
-    res.send('Deletes the rating with that username and tt_number if the client is the one who posted said rating.');
-});
-
-app.get('/api/ratings/:tt_number', function (req, res) {
-    res.send('Returns the average rating of the movie with the given tt_number');
-});
-
-app.get('/api/ratings/:username&:tt_number', function (req, res) {
-    res.send('Returns the rating with that username and tt_number if the client is the one who posted said rating.');
-});
+app.use('/api/ratings/', ratingRouter);
 
 //Start the server at port 3000.
 app.listen(3000);
