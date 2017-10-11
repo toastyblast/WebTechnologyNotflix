@@ -39,73 +39,65 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:search', function (req, res) {
+
+    function findTitle(value, callback) {
+        Movie.find({title: value}, function (err, movies) {
+            if (movies.length > 0){
+                res.json(movies);
+            } else {
+                callback();
+            }
+        });
+    }
+
+    function findDirector(value, callback) {
+        Movie.find({director: value}, function (err, movies) {
+            if (movies.length > 0){
+                console.log(movies);
+                res.json(movies);
+            } else {
+                callback();
+            }
+        });
+    }
+
+    function findTTNumber(value, callback) {
+        Movie.find({tt_number: value}, function (err, movies) {
+            if (movies.length > 0){
+                res.json(movies);
+            } else {
+                callback();
+            }
+        });
+    }
+
+    function showMessage(value, callback) {
+        res.json(value);
+    }
+
     var query = req.params.search;
-    var result = 1;
-    var backup = 2;
 
     if (isNaN(query)){
 
-        Movie.find({title: query}, function (err, movies) {
-            result = movies;
+        findTitle(query, function () {
+            findDirector(query, function () {
+                showMessage('There is no such movie.', function () {
 
-            if (result.length > 0){
-                console.log(result.length);
-                res.status(200);
-                res.json(result);
-            }
+                })
+            });
         });
 
-        Movie.find({director: query}, function (err, movies) {
-            result = movies;
-
-            if (result.length > 0){
-                console.log(result.length);
-                res.status(200);
-                res.json(result);
-            } else {
-
-                Movie.find(function (err, movies) {
-
-                    if (err) return console.error(err);
-
-                    backup = movies;
-                    //TODO: which status should be given here?
-                    // res.status(200);
-                    res.json(backup);
-                });
-            }
-        });
     } else {
 
-        Movie.find({tt_number: query}, function (err, movies) {
-            result = movies;
+        findTTNumber(query, function () {
+            showMessage('There is no such movie.', function () {
 
-            if (result.length > 0){
-                console.log(result.length);
-                res.status(200);
-                res.json(result);
-            } else {
-
-                Movie.find(function (err, movies) {
-
-                    if (err) return console.error(err);
-
-                    backup = movies;
-                    //TODO: which status should be given here?
-                    // res.status(200);
-                    res.json(backup);
-                });
-            }
+            })
         });
-    }
-
-    if (result.length < 1){
 
     }
-});
 
-router.get('/:id', function (req, res) {
-    res.json({response:'Returns the movie with that database ID!'});
+
 });
 
 module.exports = router;

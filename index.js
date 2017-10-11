@@ -3,6 +3,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var movieRouter = require('./module/moviesrouter.js');
 var ratingRouter = require('./module/ratingsrouter.js');
+var userRouter = require('./module/userrouter');
+
 var app = express();
 
 //TODO: Ask the teacher on how he'll be setting up his database. Will he first go into MongoDB to set up a "Notflix" too, or are we expected to do that in some kind of way in code?
@@ -19,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/api/movies/', movieRouter);
 
 /* -=- USER RELATED ROUTINGS -=- */
-app.use('/api/users/', ratingRouter);
+app.use('/api/users/', userRouter);
 
 /* -=- RATING RELATED ROUTINGS -=- */
 app.use('/api/ratings/', ratingRouter);
