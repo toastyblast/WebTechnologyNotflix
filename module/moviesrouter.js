@@ -1,6 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var Movie = require('../model/movies.js');
 var router = express.Router();
 
@@ -29,7 +29,7 @@ router.get('/', function (req, res) {
 
         if (err) {
             res.status(500);
-            res.json({errorMessage:'No list of movies could be found in the database.'});
+            res.json({errorMessage: 'No list of movies could be found in the database.'});
             return console.error(err);
         }
 
@@ -42,7 +42,7 @@ router.get('/:search', function (req, res) {
 
     function findTitle(value, callback) {
         Movie.find({title: value}, function (err, movies) {
-            if (movies.length > 0){
+            if (movies.length > 0) {
                 res.json(movies);
             } else {
                 callback();
@@ -52,7 +52,7 @@ router.get('/:search', function (req, res) {
 
     function findDirector(value, callback) {
         Movie.find({director: value}, function (err, movies) {
-            if (movies.length > 0){
+            if (movies.length > 0) {
                 console.log(movies);
                 res.json(movies);
             } else {
@@ -63,7 +63,7 @@ router.get('/:search', function (req, res) {
 
     function findTTNumber(value, callback) {
         Movie.find({tt_number: value}, function (err, movies) {
-            if (movies.length > 0){
+            if (movies.length > 0) {
                 res.json(movies);
             } else {
                 callback();
@@ -77,7 +77,7 @@ router.get('/:search', function (req, res) {
 
     var query = req.params.search;
 
-    if (isNaN(query)){
+    if (isNaN(query)) {
 
         findTitle(query, function () {
             findDirector(query, function () {
