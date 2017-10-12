@@ -5,11 +5,6 @@ var User = require('../model/user.js');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
-
-//Created ratings (On Yoran's Database):
-// - last_name: 'kerbusch', middle_name: '', first_name : 'yoran', username: 'yoran', passwords: 'peanuts'
-// - ...
-
 // var post = new User({
 //     last_name: '???',
 //     middle_name: '',
@@ -24,8 +19,8 @@ var router = express.Router();
 //     }
 // });
 
-
 router.post('/', function (req, res) {
+    //TODO: Make the code check if there isn't already a user with this username. The err doesn't include this. (I managed to make 2 of the same user by posting the same command twice with the same body.)
 
     var post = new User({
         last_name: req.body.lastname ,
@@ -38,9 +33,10 @@ router.post('/', function (req, res) {
     post.save(function (err, result) {
         if (err) {
             // return console.error(err);
-            res.status(409);
-            res.json("409 : User not added.")
+            res.status(500);
+            res.json("500 SERVER - User not added because of an internal server issue or a wrong body in the request.")
         } else {
+            res.status(201);
             res.json(post);
         }
     });
@@ -64,7 +60,7 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0}, function (err, users) {
+    User.find({}, {'_id': 0, 'passwords': 0, '__v' : 0}, function (err, users) {
         if (err) return console.error(err);
 
         res.json(users);
@@ -72,7 +68,7 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:usern', function (req, res) {
-    User.find({'username': req.params.usern}, function (err, users) {
+    User.find({'username': req.params.usern}, {'_id': 0, 'passwords': 0, '__v' : 0}, function (err, users) {
         if (err) return console.error(err);
         res.json(users);
     })

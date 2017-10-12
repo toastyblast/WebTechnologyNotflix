@@ -33,7 +33,7 @@ router.post('/', function (req, res) {
         });
     } else {
         res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You are not defining certain data (correctly).'})
+        res.json({errorMessage: '403 BAD REQUEST - You are not defining certain required data (correctly).'})
     }
 });
 

@@ -6,12 +6,6 @@ var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
-//Created ratings (On Yoran's Database):
-// - tt_number = 123, username = 'martin', rating = 4.5
-// - tt_number = 123, username = 'yoran', rating = 3.0
-// - tt_number = 123, username = 'toasty', rating = 3.5
-// - ...
-
 // var post = new Rating({
 //     tt_number: ???,
 //     username: '???',
@@ -113,7 +107,7 @@ router.get('/:search', function (req, res) {
                 } else {
                     //The user from the token isn't the same as the owner of this rating, so let the user not get it.
                     res.status(403);
-                    res.json({errorMessage: '403 BAD REQUEST - You are not the owner of this rating and can therefore not view it.'})
+                    res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not view it.'})
                 }
             }
         });
@@ -128,7 +122,7 @@ router.use(function (req, res, next) {
         if (err) {
             res.status(403);
             res.json({
-                errorMessage: 'FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
+                errorMessage: '403 FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
                 'not allowed to use this command.'
             });
         } else {
@@ -167,30 +161,85 @@ router.get('/:username/:tt_number', function (req, res) {
         } else {
             //The user from the token isn't the same as the owner of this rating, so let the user not get it.
             res.status(403);
-            res.json({errorMessage: '403 BAD REQUEST - You are not the owner of this rating and can therefore not view.'})
+            res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not view.'})
         }
     } else {
         res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
+        res.json({errorMessage: '400 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
     }
 });
 
 router.post('/', function (req, res) {
-    //Needs a JSON file in the body with a tt_number, username and a rating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
-    //TODO: Check if the request's body is actually filled with correct data (400)
-
+    //TODO: Maybe add a check if the movie with the tt_number also exists? Then again, this'll most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
+    //Needs a JSON file in the body with a giventt_number, username and a givenRating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
     var decoded = req.app.locals.decoded;
     var tokenUsername = decoded.username;
+    var giventt_number = parseInt(req.body.tt_number);
+    var givenRating = parseFloat(req.body.rating);
 
-    if (tokenUsername === username) {
-        //TODO: (also check if there isn't already a rating with this user and tt_number (409))
+    if (giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
 
-        res.send('Creates a rating with the sent data with the username in the token, if the user does not already have a rating on this movie!');
-        res.status(201);
+        if (givenRating > 0.0 && givenRating <= 5.0) {
+            //Make sure the givenRating is between (non-including) 0.0 and (including) 5.0
+
+            //Make sure that the givenRating only has one decimal, we can forgive the user for giving more decimals...
+            givenRating = givenRating.toFixed(1);
+
+            if (givenRating % 1.0 === 0.5 || givenRating % 1.0 === 0.0) {
+                //Then make sure that the one decimal number is either 5 (x.5) or 0 (x.0).
+
+                Rating.find({'tt_number': giventt_number}, function (err, ratings) {
+                    //Now go through checks to see if this new givenRating is actually unique.
+                    if (err) {
+                        res.status(500);
+                        res.json({errorMessage: '500 SERVER-SIDE ERROR - This specific givenRating of yours could not be found.'});
+                        return;
+                    }
+
+                    var unique = true;
+
+                    for (var i = 0; i < ratings.length; i++) {
+                        //Go through all ratings returned for this movie...
+                        if (ratings[i].username === tokenUsername) {
+                            //If one is found with the same username as of the user that's requesting this post, it's not unique...
+                            unique = false;
+                            break;
+                        }
+                    }
+
+                    if (unique) {
+                        //There is no givenRating for this movie yet from the user that is requesting this post command, so create it!
+                        var post = new Rating({
+                            tt_number: giventt_number,
+                            username: tokenUsername,
+                            rating: givenRating
+                        });
+
+                        post.save(function (err, result) {
+                            if (err) {
+                                res.status(500);
+                                res.json({errorMessage: '500 SERVER - Rating not added due to a server error.'})
+                            } else {
+                                res.status(201);
+                                res.json(post);
+                            }
+                        });
+                    } else {
+                        res.status(409);
+                        res.json({errorMessage: '409 CONFLICT - A givenRating on your username for the movie with this giventt_number already exists.'});
+                    }
+                });
+            } else {
+                res.status(400);
+                res.json({errorMessage: '400 BAD REQUEST - Rating can only be rounded on X.0 or X.5!'})
+            }
+        } else {
+            res.status(400);
+            res.json({errorMessage: '400 BAD REQUEST - Rating has to be bigger than 0.0 and smaller than 5.0 (and in increments of 0.5)'})
+        }
     } else {
-        //The user from the token isn't the same as the owner of this rating, so let the user not delete it.
-        res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You are not the owner of this rating and can therefore not change it.'})
+        res.status(400);
+        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly). Should be giventt_number: & givenRating: (both as numbers only).'})
     }
 });
 
@@ -209,7 +258,7 @@ router.put('/', function (req, res) {
     } else {
         //The user from the token isn't the same as the owner of this rating, so let the user not delete it.
         res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You are not the owner of this rating and can therefore not change it.'})
+        res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not change it.'})
     }
 });
 
@@ -248,11 +297,11 @@ router.delete('/:username/:tt_number', function (req, res) {
         } else {
             //The user from the token isn't the same as the owner of this rating, so let the user not delete it.
             res.status(403);
-            res.json({errorMessage: '403 BAD REQUEST - You are not the owner of this rating and can therefore not delete it.'})
+            res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not delete it.'})
         }
     } else {
         res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
+        res.json({errorMessage: '400 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
     }
 });
 

@@ -4,12 +4,6 @@ mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var Movie = require('../model/movies.js');
 var router = express.Router();
 
-//TODO - MARTIN: Add status returns for every case that could be reached. So also including when no list can be found (throw 500-series).
-
-//Created ratings (On Yoran's Database):
-// - tt_number = 123, title = 'Title of the movie', publication_date = '12-12-2012', length_min = 121, director = 'Director of this movie', description = 'This is the first movie in the database'
-// - ...
-
 // var post = new Movie({
 //     tt_number: ???,
 //     title: '???',
@@ -23,6 +17,10 @@ var router = express.Router();
 //         return console.error(err);
 //     }
 // });
+
+//TODO - MARTIN: Add status returns for every case that could be reached. So also including when no list can be found, throw 404 if the query cannot be found.
+
+//TODO: Find a way to have these search just on a part of a director's name or movie title (so less specific), and without case sensitivity. (So "title of" and "director of" should return the movie as well, and not only "Title of the movie" and "Director of the movie").
 
 router.get('/', function (req, res) {
     Movie.find({}, function (err, movies) {
@@ -39,9 +37,10 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:search', function (req, res) {
-
     function findTitle(value, callback) {
+
         Movie.find({title: value}, function (err, movies) {
+
             if (movies.length > 0) {
                 res.json(movies);
             } else {
@@ -51,7 +50,9 @@ router.get('/:search', function (req, res) {
     }
 
     function findDirector(value, callback) {
+
         Movie.find({director: value}, function (err, movies) {
+
             if (movies.length > 0) {
                 console.log(movies);
                 res.json(movies);
@@ -62,7 +63,9 @@ router.get('/:search', function (req, res) {
     }
 
     function findTTNumber(value, callback) {
+
         Movie.find({tt_number: value}, function (err, movies) {
+
             if (movies.length > 0) {
                 res.json(movies);
             } else {
@@ -80,24 +83,18 @@ router.get('/:search', function (req, res) {
     if (isNaN(query)) {
 
         findTitle(query, function () {
+
             findDirector(query, function () {
                 showMessage('There is no such movie.', function () {
-
                 })
             });
         });
-
     } else {
-
         findTTNumber(query, function () {
             showMessage('There is no such movie.', function () {
-
             })
         });
-
     }
-
-
 });
 
 module.exports = router;
