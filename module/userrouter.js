@@ -56,7 +56,7 @@ router.post('/:last&:first&:user&:pass', function (req, res) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'last_name' : 1, 'first_name' : 1, 'username' : 1, '_id' : 0},function (err, users) {
+    User.find({}, {'last_name' : 1, 'first_name' : 1, 'username' : 1, '_id' : 0}, function (err, users) {
         if (err) return console.error(err);
 
         res.json(users);

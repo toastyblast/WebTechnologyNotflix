@@ -1,6 +1,7 @@
 //Load the express module and create a new app with it.
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 var movieRouter = require('./module/moviesrouter.js');
 var ratingRouter = require('./module/ratingsrouter.js');
 var userRouter = require('./module/userrouter.js');
@@ -16,7 +17,6 @@ app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 
 //Parse the body of HTTP request and transform it to JSON.
-var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 /* -=- AUTHENTICATION RELATED ROUTINGS -=- */

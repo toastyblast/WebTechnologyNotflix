@@ -7,14 +7,34 @@ var User = require('../model/user.js');
 var router = express.Router();
 
 router.post('/', function (req, res) {
-    //TODO: Check if the username + password combo is right.
+    if (req.body.username !== undefined && req.body.passwords !== undefined) {
 
-    var token = jwt.sign({'username':req.headers.username}, req.app.get('secretkey'), {
-        expiresIn: 86400 //Might crash the server, so left commented out for now.
-    });
+        User.find({'username': req.body.username}, function (err, users) {
+            if (err) return console.error(err);
 
-    res.status(201);
-    res.json({'token':token})
+            if (users.length > 0) {
+
+                if (users[0].passwords === req.body.passwords) {
+                    var token = jwt.sign({'username':req.body.username}, req.app.get('secretkey'), {
+                        expiresIn: 86400 //86400 seconds equals 24 hours.
+                    });
+
+                    res.status(201);
+                    res.json({'token':token})
+                }
+                else {
+                    res.status(403);
+                    res.json({errorMessage:'403 BAD REQUEST - Your username + password combination is wrong.'})
+                }
+            } else {
+                res.status(404);
+                res.json({errorMessage:'404 NOT FOUND - There is no user with that username'})
+            }
+        });
+    } else {
+        res.status(403);
+        res.json({errorMessage:'403 BAD REQUEST - You are not defining certain data (correctly).'})
+    }
 });
 
 module.exports = router;
