@@ -35,11 +35,28 @@ router.post('/:last&:middle&:first&:user&:pass', function (req, res) {
         if (err) {
             return console.error(err);
         }
+        res.json(post);
+    });
+});
+
+router.post('/:last&:first&:user&:pass', function (req, res) {
+    var post = new User({
+        last_name: req.params.last ,
+        first_name : req.params.first,
+        username: req.params.user,
+        passwords: req.params.pass
+    });
+
+    post.save(function (err, result) {
+        if (err) {
+            return console.error(err);
+        }
+        res.json(post);
     });
 });
 
 router.get('/', function (req, res) {
-    User.find({}, function (err, users) {
+    User.find({}, {'last_name' : 1, 'first_name' : 1, 'username' : 1, '_id' : 0},function (err, users) {
         if (err) return console.error(err);
 
         res.json(users);
