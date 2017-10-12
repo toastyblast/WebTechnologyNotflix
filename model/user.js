@@ -6,7 +6,7 @@ var UserSchema =  new Schema ({
     middle_name : {type : String, required: false},
     first_name : {type: String, required:true},
     username: {type: String, required:true},
-    passwords: {type: Number, required:true}
+    passwords: {type: String, required:true}
 });
 
 module.exports = mongoose.model('User', UserSchema);

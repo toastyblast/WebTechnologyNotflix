@@ -1,11 +1,20 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+var User = require('../model/user.js');
 
-var app = express();
+var router = express.Router();
 
-app.set('secret-key', 'CounsellorPalpatineDidNothingWrong');
+router.post('/', function (req, res) {
+    //TODO: Check if the username + password combo is right.
 
-//TODO: Ask teacher on how to get data from token exactly and how to set certain data in its payload.
-var token = jwt.sign(user, app.get('secret-key'), {
-    // expiresInMinutes: 1440 //Might crash the server, so left commented out for now.
+    var token = jwt.sign({'username':req.headers.username}, req.app.get('secretkey'), {
+        expiresIn: 86400 //Might crash the server, so left commented out for now.
+    });
+
+    res.status(201);
+    res.json({'token':token})
 });
+
+module.exports = router;
