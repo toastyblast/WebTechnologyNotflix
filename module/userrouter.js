@@ -1,8 +1,10 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var router = express.Router();
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 var User = require('../model/user.js');
+var jwt = require('jsonwebtoken');
+var router = express.Router();
+
 
 //Created ratings (On Yoran's Database):
 // - last_name: 'kerbusch', middle_name: '', first_name : 'yoran', username: 'yoran', passwords: 'peanuts'
@@ -22,36 +24,42 @@ var User = require('../model/user.js');
 //     }
 // });
 
-router.post('/:last&:middle&:first&:user&:pass', function (req, res) {
+
+router.post('/', function (req, res) {
+
     var post = new User({
-        last_name: req.params.last ,
-        middle_name: req.params.middle,
-        first_name : req.params.first,
-        username: req.params.user,
-        passwords: req.params.pass
+        last_name: req.body.lastname ,
+        middle_name: req.body.middlename,
+        first_name : req.body.firstname,
+        username: req.body.usern,
+        passwords: req.body.password
     });
 
     post.save(function (err, result) {
         if (err) {
-            return console.error(err);
+            // return console.error(err);
+            res.status(409);
+            res.json("409 : User not added.")
+        } else {
+            res.json(post);
         }
-        res.json(post);
     });
 });
 
-router.post('/:last&:first&:user&:pass', function (req, res) {
-    var post = new User({
-        last_name: req.params.last ,
-        first_name : req.params.first,
-        username: req.params.user,
-        passwords: req.params.pass
-    });
+router.use(function (req, res, next) {
+    var token = req.headers.authorization;
 
-    post.save(function (err, result) {
+    jwt.verify(token, req.app.get("secretkey"), function (err, decoded) {
         if (err) {
-            return console.error(err);
+            res.status(403);
+            res.json({
+                errorMessage: 'FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
+                'not allowed to use this command.'
+            });
+        } else {
+            req.app.locals.decoded = decoded;
+            next();
         }
-        res.json(post);
     });
 });
 
