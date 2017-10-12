@@ -49,11 +49,10 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:search', function (req, res) {
-    //The user is trying to get a movie by its tt_number
     var query = parseInt(req.params.search);
 
     if (isNaN(query) === false) {
-
+        //The user is trying to get a movie by its tt_number, as they entered a number.
         Rating.find({'tt_number': query}, function (err, ratings) {
 
             if (err) {
@@ -80,6 +79,7 @@ router.get('/:search', function (req, res) {
             }
         })
     } else {
+        //The user is searching on username, as they entered a String.
         query = req.params.search;
 
         var token = req.headers.authorization;

@@ -1,7 +1,7 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var User = require('../model/user.js');
 
 var router = express.Router();
@@ -15,25 +15,25 @@ router.post('/', function (req, res) {
             if (users.length > 0) {
 
                 if (users[0].passwords === req.body.passwords) {
-                    var token = jwt.sign({'username':req.body.username}, req.app.get('secretkey'), {
+                    var token = jwt.sign({'username': req.body.username}, req.app.get('secretkey'), {
                         expiresIn: 86400 //86400 seconds equals 24 hours.
                     });
 
                     res.status(201);
-                    res.json({'token':token})
+                    res.json({'token': token})
                 }
                 else {
                     res.status(403);
-                    res.json({errorMessage:'403 BAD REQUEST - Your username + password combination is wrong.'})
+                    res.json({errorMessage: '403 BAD REQUEST - Your username + password combination is wrong.'})
                 }
             } else {
                 res.status(404);
-                res.json({errorMessage:'404 NOT FOUND - There is no user with that username'})
+                res.json({errorMessage: '404 NOT FOUND - There is no user with that username'})
             }
         });
     } else {
         res.status(403);
-        res.json({errorMessage:'403 BAD REQUEST - You are not defining certain data (correctly).'})
+        res.json({errorMessage: '403 BAD REQUEST - You are not defining certain data (correctly).'})
     }
 });
 

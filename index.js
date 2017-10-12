@@ -14,7 +14,7 @@ app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 //TODO: Ask the teacher on how he'll be setting up his database. Will he first go into MongoDB to set up a "Notflix" too, or are we expected to do that in some kind of way in code?
 
 //Start the Mongoose connection.
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 
 //Parse the body of HTTP request and transform it to JSON.
 app.use(bodyParser.json());
