@@ -170,7 +170,9 @@ router.get('/:username/:tt_number', function (req, res) {
 });
 
 router.post('/', function (req, res) {
-    //TODO: Maybe add a check if the movie with the tt_number also exists? Then again, this'll most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
+    //TODO - NOTE (NOT REALLY TODO, IGNORE): Maybe add a check if the movie with the tt_number also exists? Then again, this'll
+    // TODO... most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
+    
     //Needs a JSON file in the body with a giventt_number, username and a givenRating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
     var decoded = req.app.locals.decoded;
     var tokenUsername = decoded.username;
