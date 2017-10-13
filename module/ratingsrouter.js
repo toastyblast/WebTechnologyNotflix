@@ -6,18 +6,6 @@ var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
-// var post = new Rating({
-//     tt_number: ???,
-//     username: '???',
-//     rating: ???.???
-// });
-//
-// post.save(function (err, result) {
-//     if (err) {
-//         return console.error(err);
-//     }
-// });
-
 router.get('/', function (req, res) {
 
     Rating.find({}, function (err, ratings) {

@@ -4,20 +4,6 @@ mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var Movie = require('../model/movies.js');
 var router = express.Router();
 
-// var post = new Movie({
-//     tt_number: ???,
-//     title: '???',
-//     publication_date: DD-MM-YYYY,
-//     length_min: ???,
-//     director: '??? ???',
-//     description: '???'});
-//
-// post.save(function (err, result) {
-//     if (err) {
-//         return console.error(err);
-//     }
-// });
-
 //TODO - MARTIN: Add status returns for every case that could be reached. So also including when no list can be found, throw 404 if the query cannot be found.
 
 //TODO: Find a way to have these search just on a part of a director's name or movie title (so less specific), and without case sensitivity. (So "title of" and "director of" should return the movie as well, and not only "Title of the movie" and "Director of the movie").

@@ -5,20 +5,6 @@ var User = require('../model/user.js');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
-// var post = new User({
-//     last_name: '???',
-//     middle_name: '',
-//     first_name : '???',
-//     username: '???',
-//     passwords: '???'
-// });
-//
-// post.save(function (err, result) {
-//     if (err) {
-//         return console.error(err);
-//     }
-// });
-
 router.post('/', function (req, res) {
     //TODO: Make the code check if there isn't already a user with this username. The err doesn't include this. (I managed to make 2 of the same user by posting the same command twice with the same body.)
 
