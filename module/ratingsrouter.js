@@ -56,6 +56,7 @@ router.get('/:search', function (req, res) {
             }
 
             if (ratings.length > 0) {
+                //Check if the result isn't empty, aka the movie has no ratings.
                 var amountOfRatings;
                 var average = 0;
 
@@ -79,6 +80,7 @@ router.get('/:search', function (req, res) {
         var token = req.headers.authorization;
 
         jwt.verify(token, req.app.get("secretkey"), function (err, decoded) {
+            //Verify the token the user sent back to you.
             if (err) {
                 res.status(403);
                 res.json({
@@ -89,6 +91,7 @@ router.get('/:search', function (req, res) {
                 var tokenUsername = decoded.username;
 
                 if (tokenUsername === query) {
+                    //Check if the user should be allowed to see the list of ratings made by a user, if they are that user.
                     Rating.find({'username': query}, function (err, ratings) {
                         if (err) {
                             res.status(500);
@@ -97,6 +100,7 @@ router.get('/:search', function (req, res) {
                         }
 
                         if (ratings.length > 0) {
+                            //Check if there's actually something in the resulting list.
                             res.status(200);
                             res.json(ratings);
                         } else {
@@ -114,18 +118,19 @@ router.get('/:search', function (req, res) {
     }
 });
 
-// MIDDLEWARE FOR VERIFICATION
+// MIDDLEWARE FOR VERIFICATION OF THE USER'S TOKEN
+// Fun fact about middleware: It only applies onto all routings under it, and not also the ones above it.
 router.use(function (req, res, next) {
     var token = req.headers.authorization;
 
     jwt.verify(token, req.app.get("secretkey"), function (err, decoded) {
+        //Verify the token the user sent back to you.
         if (err) {
             res.status(403);
-            res.json({
-                errorMessage: '403 FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
-                'not allowed to use this command.'
-            });
+            res.json({errorMessage: '403 FORBIDDEN - You do not have a valid token, meaning you are not logged in and ' +
+            'therefore not allowed to use this command.'});
         } else {
+            //If so, store the decoded information for use by the commands under this middleware.
             req.app.locals.decoded = decoded;
             next();
         }
@@ -142,6 +147,7 @@ router.get('/:username/:tt_number', function (req, res) {
         var tokenUsername = decoded.username;
 
         if (tokenUsername === username) {
+            //Check if the authorized user is the user they are requesting to see.
             Rating.find({'username': username, 'tt_number': tt_number}, function (err, rating) {
 
                 if (err) {
@@ -151,6 +157,7 @@ router.get('/:username/:tt_number', function (req, res) {
                 }
 
                 if (rating.length > 0) {
+                    //Check if there's actually a rating with this username and tt_number.
                     res.status(200);
                     res.json(rating);
                 } else {
@@ -188,7 +195,7 @@ router.delete('/:username/:tt_number', function (req, res) {
                 }
 
                 if (rating.length > 0) {
-
+                    //Check if there's actually a rating for this username and tt_number, as you can't delete something that doesn't exist.
                     Rating.remove({'username': username, 'tt_number': tt_number}, function (err) {
 
                         if (err) return handleError(err);
@@ -280,12 +287,14 @@ router.post('/', function (req, res) {
 
         if (unique) {
             //There is no givenRating for this movie yet from the user that is requesting this post command, so create it!
+            //Create the new rating.
             var post = new Rating({
                 tt_number: giventt_number,
                 username: tokenUsername,
                 rating: givenRating
             });
 
+            //And finally save the new rating.
             post.save(function (err, result) {
                 if (err) {
                     res.status(500);
@@ -318,7 +327,9 @@ router.put('/', function (req, res) {
         }
 
         if (ratings.length > 0) {
+            //Check if there's actually a rating for this user and this movie...
             Rating.update({'tt_number': giventt_number, 'username': tokenUsername}, {'$set': {'rating': givenRating}}, function(err) {
+                //And so if not, update the rating!
                 if (err) {
                     res.status(500);
                     res.json({errorMessage: '500 SERVER-SIDE ERROR - Issue arose while trying to update the rating.'});
