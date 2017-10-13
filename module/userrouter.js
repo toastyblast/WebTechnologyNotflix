@@ -6,26 +6,42 @@ var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.post('/', function (req, res) {
-    //TODO: Make the code check if there isn't already a user with this username. The err doesn't include this. (I managed to make 2 of the same user by posting the same command twice with the same body.)
 
-    var post = new User({
-        last_name: req.body.lastname ,
-        middle_name: req.body.middlename,
-        first_name : req.body.firstname,
-        username: req.body.usern,
-        passwords: req.body.password
-    });
+    if (req.body.password.length < 4) {
+        res.status(400);
+        res.json({errorMessage : 'ERROR : INSUFFICIENT DATA. Password too short.'});
+        res.end();
+    } else {
+        var post = new User({
+            last_name: req.body.lastname,
+            middle_name: req.body.middlename,
+            first_name: req.body.firstname,
+            username: req.body.usern,
+            passwords: req.body.password
+        });
 
-    post.save(function (err, result) {
-        if (err) {
-            // return console.error(err);
-            res.status(500);
-            res.json("500 SERVER - User not added because of an internal server issue or a wrong body in the request.")
-        } else {
-            res.status(201);
-            res.json(post);
-        }
-    });
+        post.save(function (err, result) {
+            if (err) {
+                if (err.errmsg !== undefined) {
+                    if (err.errmsg.indexOf("duplicate") !== -1) {
+                        res.status(409);
+                        res.json({errorMessage: 'ERROR : USERNAME ALREADY TAKEN.'});
+                    }
+                } else if (err.message !== undefined) {
+                    if (err.message.indexOf("required") !== -1) {
+                        res.status(400);
+                        res.json({
+                            errorMessage: 'ERROR : INSUFFICIENT DATA : '
+                            + err.message
+                        });
+                    }
+                }
+            } else {
+                res.json(result);
+            }
+        });
+    }
+
 });
 
 router.use(function (req, res, next) {
@@ -46,18 +62,54 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'_id': 0, 'passwords': 0, '__v' : 0}, function (err, users) {
-        if (err) return console.error(err);
-
-        res.json(users);
+    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0}, function (err, users) {
+        if (err) {
+            res.status(500);
+            res.json({errorMessage: 'No list of users could be found in the database.'});
+            return console.error(err);
+        } else {
+            res.json(users);
+        }
     });
 });
 
-router.get('/:usern', function (req, res) {
-    User.find({'username': req.params.usern}, {'_id': 0, 'passwords': 0, '__v' : 0}, function (err, users) {
-        if (err) return console.error(err);
-        res.json(users);
+router.get('/user/:usern', function (req, res) {
+    User.find({'username': req.params.usern}, function (err, users) {
+        if (err) {
+            res.status(500);
+            res.json({errorMessage: 'No list of users could be found in the database.'});
+            return console.error(err);
+        } else if (users.length === 0) {
+            res.status(404);
+            res.json({errorMessage: 'ERROR : NO USER FOUND.'});
+        } else {
+            res.json(users);
+        }
     })
+});
+
+router.get('/users/:limitresult', function (req, res) {
+    if (isNaN(req.params.limitresult)) {
+        res.status(400);
+        res.json('Please enter a number to specify how many users you want to see.');
+    } else {
+        User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0}, function (err, users) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of users could be found in the database.'});
+                return console.error(err);
+            } else {
+                res.json(users);
+            }
+        }).limit(parseInt(req.params.limitresult));
+    }
+});
+
+app.put('/users/favourites/:id&:movie', function (req, res) {
+    User.findByIdAndUpdate(req.params.id, { $push: { favourites: req.params.movie }}, { new: true }, function (err, user) {
+        if (err) return handleError(err);
+        res.send(user);
+    });
 });
 
 module.exports = router;

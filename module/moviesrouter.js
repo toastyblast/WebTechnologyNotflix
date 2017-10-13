@@ -23,11 +23,14 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:search', function (req, res) {
+
     function findTitle(value, callback) {
-
         Movie.find({title: value}, function (err, movies) {
-
-            if (movies.length > 0) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            } else if (movies.length > 0) {
                 res.json(movies);
             } else {
                 callback();
@@ -36,11 +39,12 @@ router.get('/:search', function (req, res) {
     }
 
     function findDirector(value, callback) {
-
         Movie.find({director: value}, function (err, movies) {
-
-            if (movies.length > 0) {
-                console.log(movies);
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            } else if (movies.length > 0) {
                 res.json(movies);
             } else {
                 callback();
@@ -49,10 +53,12 @@ router.get('/:search', function (req, res) {
     }
 
     function findTTNumber(value, callback) {
-
         Movie.find({tt_number: value}, function (err, movies) {
-
-            if (movies.length > 0) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            } else if (movies.length > 0) {
                 res.json(movies);
             } else {
                 callback();
@@ -60,8 +66,9 @@ router.get('/:search', function (req, res) {
         });
     }
 
-    function showMessage(value, callback) {
-        res.json(value);
+    function showMessage(callback) {
+        res.status(404);
+        res.json('ERROR 404 - There is no such movie.');
     }
 
     var query = req.params.search;
@@ -69,18 +76,24 @@ router.get('/:search', function (req, res) {
     if (isNaN(query)) {
 
         findTitle(query, function () {
-
             findDirector(query, function () {
-                showMessage('There is no such movie.', function () {
+                showMessage(function () {
+
                 })
             });
         });
+
     } else {
+
         findTTNumber(query, function () {
-            showMessage('There is no such movie.', function () {
+            showMessage(function () {
+
             })
         });
+
     }
+
+
 });
 
 module.exports = router;
