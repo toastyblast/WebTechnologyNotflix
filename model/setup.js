@@ -5,7 +5,7 @@ var Rating = require('../model/ratings.js');
 
 //TODO: Add dummy data to the database's tables, if there's none in it (aka startup)
 
-// MOVIES
+/* MOVIES */
 // var post = new Movie({
 //     tt_number: ???,
 //     title: '???',
@@ -20,7 +20,7 @@ var Rating = require('../model/ratings.js');
 //     }
 // });
 
-// USERS
+/* USERS */
 // var post = new User({
 //     last_name: '???',
 //     middle_name: '',
@@ -35,7 +35,7 @@ var Rating = require('../model/ratings.js');
 //     }
 // });
 
-// RATINGS
+/* RATINGS */
 // var post = new Rating({
 //     tt_number: ???,
 //     username: '???',

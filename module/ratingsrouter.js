@@ -55,7 +55,11 @@ router.get('/:search', function (req, res) {
                 average = Math.round((average / amountOfRatings) * 100) / 100;
 
                 res.status(200);
-                res.json({message: 'Average rating for the sought movie.', tt_number: query, averageRating: average});
+                res.json({
+                    confirmationMessage: '200 OK - Average rating for the sought movie has been retrieved.',
+                    tt_number: query,
+                    averageRating: average
+                });
             } else {
                 res.status(404);
                 res.json({errorMessage: '404 NOT FOUND - No ratings for a film with this tt_number can be found. Either it has no ratings or the movie does not exist.'});
@@ -72,7 +76,7 @@ router.get('/:search', function (req, res) {
             if (err) {
                 res.status(403);
                 res.json({
-                    errorMessage: 'FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
+                    errorMessage: '403 FORBIDDEN - You do not have a token, meaning you are not logged in and therefore ' +
                     'not allowed to use this command.'
                 });
             } else {
@@ -98,7 +102,7 @@ router.get('/:search', function (req, res) {
                     });
                 } else {
                     //The user from the token isn't the same as the owner of this rating, so let the user not get it.
-                    res.status(403);
+                    res.status(400);
                     res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not view it.'})
                 }
             }
@@ -115,8 +119,10 @@ router.use(function (req, res, next) {
         //Verify the token the user sent back to you.
         if (err) {
             res.status(403);
-            res.json({errorMessage: '403 FORBIDDEN - You do not have a valid token, meaning you are not logged in and ' +
-            'therefore not allowed to use this command.'});
+            res.json({
+                errorMessage: '403 FORBIDDEN - You do not have a valid token, meaning you are not logged in and ' +
+                'therefore not allowed to use this command.'
+            });
         } else {
             //If so, store the decoded information for use by the commands under this middleware.
             req.app.locals.decoded = decoded;
@@ -155,11 +161,11 @@ router.get('/:username/:tt_number', function (req, res) {
             });
         } else {
             //The user from the token isn't the same as the owner of this rating, so let the user not get it.
-            res.status(403);
+            res.status(400);
             res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not view.'})
         }
     } else {
-        res.status(403);
+        res.status(400);
         res.json({errorMessage: '400 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
     }
 });
@@ -189,7 +195,7 @@ router.delete('/:username/:tt_number', function (req, res) {
                         if (err) return handleError(err);
 
                         res.status(200);
-                        res.json({confirmationMessage:'200 OK - Rating has successfully been removed.'});
+                        res.json({confirmationMessage: '200 OK - Rating has successfully been removed.'});
                     });
                 } else {
                     res.status(404);
@@ -294,7 +300,7 @@ router.post('/', function (req, res) {
             });
         } else {
             res.status(409);
-            res.json({errorMessage: '409 CONFLICT - A givenRating on your username for the movie with this giventt_number already exists.'});
+            res.json({errorMessage: '409 CONFLICT - A givenRating on your username for the movie with this given tt_number already exists.'});
         }
     });
 });
@@ -316,7 +322,10 @@ router.put('/', function (req, res) {
 
         if (ratings.length > 0) {
             //Check if there's actually a rating for this user and this movie...
-            Rating.update({'tt_number': giventt_number, 'username': tokenUsername}, {'$set': {'rating': givenRating}}, function(err) {
+            Rating.update({
+                'tt_number': giventt_number,
+                'username': tokenUsername
+            }, {'$set': {'rating': givenRating}}, function (err) {
                 //And so if not, update the rating!
                 if (err) {
                     res.status(500);
@@ -325,7 +334,7 @@ router.put('/', function (req, res) {
                 }
 
                 res.status(200);
-                res.send({confirmationMessage:'200 OK - Your rating has been updated with the new score.'});
+                res.send({confirmationMessage: '200 OK - Your rating has been updated with the new score.'});
             });
         } else {
             res.status(404);

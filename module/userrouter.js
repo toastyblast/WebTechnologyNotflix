@@ -1,15 +1,14 @@
 var express = require('express');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var User = require('../model/user.js');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.post('/', function (req, res) {
-
     if (req.body.password.length < 4) {
         res.status(400);
-        res.json({errorMessage : 'ERROR : INSUFFICIENT DATA. Password too short.'});
+        res.json({errorMessage: 'ERROR : INSUFFICIENT DATA. Password too short.'});
         res.end();
     } else {
         var post = new User({
@@ -22,18 +21,18 @@ router.post('/', function (req, res) {
 
         post.save(function (err, result) {
             if (err) {
+
                 if (err.errmsg !== undefined) {
+
                     if (err.errmsg.indexOf("duplicate") !== -1) {
                         res.status(409);
-                        res.json({errorMessage: 'ERROR : USERNAME ALREADY TAKEN.'});
+                        res.json({errorMessage: '409 CONFLICT - That username has already been taken'});
                     }
                 } else if (err.message !== undefined) {
+
                     if (err.message.indexOf("required") !== -1) {
                         res.status(400);
-                        res.json({
-                            errorMessage: 'ERROR : INSUFFICIENT DATA : '
-                            + err.message
-                        });
+                        res.json({errorMessage: '400 BAD REQUEST - Insufficient data: ' + err.message});
                     }
                 }
             } else {
@@ -41,7 +40,6 @@ router.post('/', function (req, res) {
             }
         });
     }
-
 });
 
 router.use(function (req, res, next) {
@@ -105,8 +103,8 @@ router.get('/users/:limitresult', function (req, res) {
     }
 });
 
-app.put('/users/favourites/:id&:movie', function (req, res) {
-    User.findByIdAndUpdate(req.params.id, { $push: { favourites: req.params.movie }}, { new: true }, function (err, user) {
+router.put('/users/favourites/:id&:movie', function (req, res) {
+    User.findByIdAndUpdate(req.params.id, {$push: {favourites: req.params.movie}}, {new: true}, function (err, user) {
         if (err) return handleError(err);
         res.send(user);
     });
