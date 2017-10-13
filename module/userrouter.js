@@ -1,14 +1,16 @@
 var express = require('express');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 var User = require('../model/user.js');
+var Movie = require('../model/movies.js');
+
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.post('/', function (req, res) {
     if (req.body.password.length < 4) {
         res.status(400);
-        res.json({errorMessage: 'ERROR : INSUFFICIENT DATA. Password too short.'});
+        res.json({errorMessage : 'ERROR : INSUFFICIENT DATA. Password too short.'});
         res.end();
     } else {
         var post = new User({
@@ -32,7 +34,10 @@ router.post('/', function (req, res) {
 
                     if (err.message.indexOf("required") !== -1) {
                         res.status(400);
-                        res.json({errorMessage: '400 BAD REQUEST - Insufficient data: ' + err.message});
+                        res.json({
+                            errorMessage: 'ERROR : INSUFFICIENT DATA : '
+                            + err.message
+                        });
                     }
                 }
             } else {
@@ -60,7 +65,7 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0}, function (err, users) {
+    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0 , 'favourites' : 1}, function (err, users) {
         if (err) {
             res.status(500);
             res.json({errorMessage: 'No list of users could be found in the database.'});
@@ -103,11 +108,64 @@ router.get('/users/:limitresult', function (req, res) {
     }
 });
 
-router.put('/users/favourites/:id&:movie', function (req, res) {
-    User.findByIdAndUpdate(req.params.id, {$push: {favourites: req.params.movie}}, {new: true}, function (err, user) {
-        if (err) return handleError(err);
-        res.send(user);
-    });
+router.put('/favourites/:movie', function (req, res) {
+    var tokenUsername = req.app.locals.decoded.username;
+    console.log(tokenUsername);
+
+    function three(callback) {
+        Movie.find({title: req.params.movie}, function (err, movies) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            } else if (movies.length === 0) {
+                res.status(500);
+                res.json({errorMessage: 'You cannot add a movie that does not exist in our DB.'});
+            } else {
+                callback();
+            }
+        });
+    }
+
+    function one(callback) {
+        User.find({'username': tokenUsername}, function (err, users) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of users could be found in the database.'});
+                return console.error(err);
+            } else if (users.length === 0) {
+                res.status(404);
+                res.json({errorMessage: 'ERROR : NO USER FOUND.'});
+            } else {
+                // console.log(users);
+                userfound = users[0];
+                callback();
+            }
+        });
+    }
+
+    //TODO: Maybe find a way to show the user that the movie, that he is trying to add is already in favourites.
+    function two(smth, callback) {
+        console.log(smth._id);
+        User.findOneAndUpdate(smth._id, { $addToSet: { favourites: req.params.movie}}, { new: true }, function (err, user) {
+            if (err)
+            {
+                res.json(err);
+            } else {
+                res.json(user);
+            }
+        });
+    }
+
+    three(function () {
+        one(function () {
+            two(userfound, function () {
+
+            })
+        });
+    })
+
+
 });
 
 module.exports = router;
