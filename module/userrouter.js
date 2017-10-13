@@ -2,6 +2,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 var User = require('../model/user.js');
+var Movie = require('../model/movies.js');
+
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
@@ -62,7 +64,7 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0}, function (err, users) {
+    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0 , 'favourites' : 1}, function (err, users) {
         if (err) {
             res.status(500);
             res.json({errorMessage: 'No list of users could be found in the database.'});
@@ -105,11 +107,62 @@ router.get('/users/:limitresult', function (req, res) {
     }
 });
 
-app.put('/users/favourites/:id&:movie', function (req, res) {
-    User.findByIdAndUpdate(req.params.id, { $push: { favourites: req.params.movie }}, { new: true }, function (err, user) {
-        if (err) return handleError(err);
-        res.send(user);
-    });
+router.put('/favourites/:id&:movie', function (req, res) {
+    var userfound;
+    
+    function three(callback) {
+        Movie.find({title: req.params.movie}, function (err, movies) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            } else if (movies.length === 0) {
+                res.status(500);
+                res.json({errorMessage: 'You cannot add a movie that does not exist in our DB.'});
+            } else {
+                callback();
+            }
+        });
+    }
+
+    function one(callback) {
+        User.find({'username': req.params.id}, function (err, users) {
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of users could be found in the database.'});
+                return console.error(err);
+            } else if (users.length === 0) {
+                res.status(404);
+                res.json({errorMessage: 'ERROR : NO USER FOUND.'});
+            } else {
+                // console.log(users);
+                userfound = users[0];
+                callback();
+            }
+        });
+    }
+
+    function two(smth, callback) {
+        console.log(smth._id);
+        User.findOneAndUpdate(smth._id, { $push: { favourites: req.params.movie}}, { new: true }, function (err, user) {
+            if (err)
+            {
+                res.json(err);
+            } else {
+                res.json(user);
+            }
+        });
+    }
+
+    three(function () {
+        one(function () {
+            two(userfound, function () {
+
+            })
+        });
+    })
+
+
 });
 
 module.exports = router;
