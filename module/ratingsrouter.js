@@ -169,101 +169,6 @@ router.get('/:username/:tt_number', function (req, res) {
     }
 });
 
-router.post('/', function (req, res) {
-    //TODO - NOTE (NOT REALLY TODO, IGNORE): Maybe add a check if the movie with the tt_number also exists? Then again, this'll
-    // TODO... most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
-    
-    //Needs a JSON file in the body with a giventt_number, username and a givenRating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
-    var decoded = req.app.locals.decoded;
-    var tokenUsername = decoded.username;
-    var giventt_number = parseInt(req.body.tt_number);
-    var givenRating = parseFloat(req.body.rating);
-
-    if (giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
-
-        if (givenRating > 0.0 && givenRating <= 5.0) {
-            //Make sure the givenRating is between (non-including) 0.0 and (including) 5.0
-
-            //Make sure that the givenRating only has one decimal, we can forgive the user for giving more decimals...
-            givenRating = givenRating.toFixed(1);
-
-            if (givenRating % 1.0 === 0.5 || givenRating % 1.0 === 0.0) {
-                //Then make sure that the one decimal number is either 5 (x.5) or 0 (x.0).
-
-                Rating.find({'tt_number': giventt_number}, function (err, ratings) {
-                    //Now go through checks to see if this new givenRating is actually unique.
-                    if (err) {
-                        res.status(500);
-                        res.json({errorMessage: '500 SERVER-SIDE ERROR - This specific givenRating of yours could not be found.'});
-                        return;
-                    }
-
-                    var unique = true;
-
-                    for (var i = 0; i < ratings.length; i++) {
-                        //Go through all ratings returned for this movie...
-                        if (ratings[i].username === tokenUsername) {
-                            //If one is found with the same username as of the user that's requesting this post, it's not unique...
-                            unique = false;
-                            break;
-                        }
-                    }
-
-                    if (unique) {
-                        //There is no givenRating for this movie yet from the user that is requesting this post command, so create it!
-                        var post = new Rating({
-                            tt_number: giventt_number,
-                            username: tokenUsername,
-                            rating: givenRating
-                        });
-
-                        post.save(function (err, result) {
-                            if (err) {
-                                res.status(500);
-                                res.json({errorMessage: '500 SERVER - Rating not added due to a server error.'})
-                            } else {
-                                res.status(201);
-                                res.json(post);
-                            }
-                        });
-                    } else {
-                        res.status(409);
-                        res.json({errorMessage: '409 CONFLICT - A givenRating on your username for the movie with this giventt_number already exists.'});
-                    }
-                });
-            } else {
-                res.status(400);
-                res.json({errorMessage: '400 BAD REQUEST - Rating can only be rounded on X.0 or X.5!'})
-            }
-        } else {
-            res.status(400);
-            res.json({errorMessage: '400 BAD REQUEST - Rating has to be bigger than 0.0 and smaller than 5.0 (and in increments of 0.5)'})
-        }
-    } else {
-        res.status(400);
-        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly). Should be giventt_number: & givenRating: (both as numbers only).'})
-    }
-});
-
-router.put('/', function (req, res) {
-    //Needs a JSON with tt_number, username and rating OR a /:username & /:tt_number plus the new rating. ASK TEACHER.
-    //TODO: check if there's both a username and a tt_number specified. Also check if the body has the right new rating parameter (403)
-
-    //TODO: Check if the requested rating to update actually exists (404)
-    var decoded = req.app.locals.decoded;
-    var tokenUsername = decoded.username;
-
-    if (tokenUsername === username) {
-        //TODO:
-        res.send('Updates a rating made by this user of the movie with the specified tt_number');
-        res.status(200);
-    } else {
-        //The user from the token isn't the same as the owner of this rating, so let the user not delete it.
-        res.status(403);
-        res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not change it.'})
-    }
-});
-
 router.delete('/:username/:tt_number', function (req, res) {
     //The user has filled in both a username (must be theirs) and a tt_number to get a review they made on a specific tt_number movie.
     var decoded = req.app.locals.decoded;
@@ -289,7 +194,7 @@ router.delete('/:username/:tt_number', function (req, res) {
                         if (err) return handleError(err);
 
                         res.status(200);
-                        res.send('Rating has successfully been removed.');
+                        res.json({confirmationMessage:'200 OK - Rating has successfully been removed.'});
                     });
                 } else {
                     res.status(404);
@@ -298,13 +203,136 @@ router.delete('/:username/:tt_number', function (req, res) {
             });
         } else {
             //The user from the token isn't the same as the owner of this rating, so let the user not delete it.
-            res.status(403);
+            res.status(400);
             res.json({errorMessage: '400 BAD REQUEST - You are not the owner of this rating and can therefore not delete it.'})
         }
     } else {
-        res.status(403);
+        res.status(400);
         res.json({errorMessage: '400 BAD REQUEST - You should provide this command like: localhost:[port]/api/ratings/:username/:tt_number'})
     }
+});
+
+// MIDDLEWARE FOR CHECKING IF GIVEN RATING POST & PUT BODIES ARE CORRECT
+router.use(function (req, res, next) {
+    //Needs a JSON file in the body with a giventt_number and a givenRating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
+    var giventt_number = parseInt(req.body.tt_number);
+    var givenRating = parseFloat(req.body.rating);
+
+    if (giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
+
+        if (givenRating > 0.0 && givenRating <= 5.0) {
+            //Make sure the givenRating is between (non-including) 0.0 and (including) 5.0
+
+            //Make sure that the givenRating only has one decimal, we can forgive the user for giving more decimals...
+            givenRating = givenRating.toFixed(1);
+
+            if (givenRating % 1.0 === 0.5 || givenRating % 1.0 === 0.0) {
+                //Then make sure that the one decimal number is either 5 (x.5) or 0 (x.0).
+
+                //And now that we know that the ratings are valid, then store them so that the commands found under this
+                // one can use them, safely knowing their middleware checked them.
+                req.app.locals.giventt_number = giventt_number;
+                req.app.locals.givenRating = givenRating;
+
+                next();
+            } else {
+                res.status(400);
+                res.json({errorMessage: '400 BAD REQUEST - Rating can only be rounded on X.0 or X.5!'})
+            }
+        } else {
+            res.status(400);
+            res.json({errorMessage: '400 BAD REQUEST - Rating has to be bigger than 0.0 and smaller than 5.0 (and in increments of 0.5)'})
+        }
+    } else {
+        res.status(400);
+        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly). Should be giventt_number: & givenRating: (both as numbers only).'})
+    }
+});
+
+router.post('/', function (req, res) {
+    //TODO - NOTE (NOT REALLY TODO, IGNORE): Maybe add a check if the movie with the tt_number also exists? Then again, this'll
+    // TODO... most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
+
+    //Due to the middleware we already know that the given rating is valid (between 0.0 and 5.0 included and in increments of 0.5).
+    var decoded = req.app.locals.decoded;
+    var tokenUsername = decoded.username;
+    var giventt_number = req.app.locals.giventt_number;
+    var givenRating = req.app.locals.givenRating;
+
+    Rating.find({'tt_number': giventt_number}, function (err, ratings) {
+        //Now go through checks to see if this new givenRating is actually unique.
+        if (err) {
+            res.status(500);
+            res.json({errorMessage: '500 SERVER-SIDE ERROR - This specific givenRating of yours could not be found.'});
+            return;
+        }
+
+        var unique = true;
+
+        for (var i = 0; i < ratings.length; i++) {
+            //Go through all ratings returned for this movie...
+            if (ratings[i].username === tokenUsername) {
+                //If one is found with the same username as of the user that's requesting this post, it's not unique...
+                unique = false;
+                break;
+            }
+        }
+
+        if (unique) {
+            //There is no givenRating for this movie yet from the user that is requesting this post command, so create it!
+            var post = new Rating({
+                tt_number: giventt_number,
+                username: tokenUsername,
+                rating: givenRating
+            });
+
+            post.save(function (err, result) {
+                if (err) {
+                    res.status(500);
+                    res.json({errorMessage: '500 SERVER - Rating not added due to a server error.'})
+                } else {
+                    res.status(201);
+                    res.json(post);
+                }
+            });
+        } else {
+            res.status(409);
+            res.json({errorMessage: '409 CONFLICT - A givenRating on your username for the movie with this giventt_number already exists.'});
+        }
+    });
+});
+
+router.put('/', function (req, res) {
+    //Due to the middleware we already know that the given rating is valid (between 0.0 and 5.0 included and in increments of 0.5).
+    var decoded = req.app.locals.decoded;
+    var tokenUsername = decoded.username;
+    var giventt_number = req.app.locals.giventt_number;
+    var givenRating = req.app.locals.givenRating;
+
+    Rating.find({'tt_number': giventt_number, 'username': tokenUsername}, function (err, ratings) {
+        //Then find a rating with the given tt_number and the username of the authorized user.
+        if (err) {
+            res.status(500);
+            res.json({errorMessage: '500 SERVER-SIDE ERROR - This specific Rating of yours could not be found.'});
+            return;
+        }
+
+        if (ratings.length > 0) {
+            Rating.update({'tt_number': giventt_number, 'username': tokenUsername}, {'$set': {'rating': givenRating}}, function(err) {
+                if (err) {
+                    res.status(500);
+                    res.json({errorMessage: '500 SERVER-SIDE ERROR - Issue arose while trying to update the rating.'});
+                    return;
+                }
+
+                res.status(200);
+                res.send({confirmationMessage:'200 OK - Your rating has been updated with the new score.'});
+            });
+        } else {
+            res.status(404);
+            res.json({errorMessage: '404 NOT FOUND - Rating with given tt_number and username cannot be found.'})
+        }
+    });
 });
 
 module.exports = router;
