@@ -107,9 +107,10 @@ router.get('/users/:limitresult', function (req, res) {
     }
 });
 
-router.put('/favourites/:id&:movie', function (req, res) {
-    var userfound;
-    
+router.put('/favourites/:movie', function (req, res) {
+    var tokenUsername = req.app.locals.decoded.username;
+    console.log(tokenUsername);
+
     function three(callback) {
         Movie.find({title: req.params.movie}, function (err, movies) {
             if (err) {
@@ -126,7 +127,7 @@ router.put('/favourites/:id&:movie', function (req, res) {
     }
 
     function one(callback) {
-        User.find({'username': req.params.id}, function (err, users) {
+        User.find({'username': tokenUsername}, function (err, users) {
             if (err) {
                 res.status(500);
                 res.json({errorMessage: 'No list of users could be found in the database.'});
@@ -142,9 +143,10 @@ router.put('/favourites/:id&:movie', function (req, res) {
         });
     }
 
+    //TODO: Maybe find a way to show the user that the movie, that he is trying to add is already in favourites.
     function two(smth, callback) {
         console.log(smth._id);
-        User.findOneAndUpdate(smth._id, { $push: { favourites: req.params.movie}}, { new: true }, function (err, user) {
+        User.findOneAndUpdate(smth._id, { $addToSet: { favourites: req.params.movie}}, { new: true }, function (err, user) {
             if (err)
             {
                 res.json(err);
