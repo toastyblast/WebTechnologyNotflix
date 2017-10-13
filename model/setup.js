@@ -5,11 +5,12 @@ var Rating = require('../model/ratings.js');
 
 //TODO: Add dummy data to the database's tables, if there's none in it (aka startup)
 
+//TODO - MOVIES: The publication_date doesn't work for some reason, always sets to something like 1969-12-31T23:59:57.988Z
 /* MOVIES */
 // var post = new Movie({
 //     tt_number: ???,
 //     title: '???',
-//     publication_date: DD-MM-YYYY,
+//     publication_date: YYYY-MM-DD,
 //     length_min: ???,
 //     director: '??? ???',
 //     description: '???'});

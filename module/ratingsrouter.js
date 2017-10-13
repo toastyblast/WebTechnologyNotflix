@@ -1,32 +1,72 @@
 var express = require('express');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
+var Movie = require('../model/movies.js');
 var Rating = require('../model/ratings.js');
 var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
 router.get('/', function (req, res) {
+    var jsonString = '{"The average ratings":[]}';
+    var obj = JSON.parse(jsonString);
+    var moviett_number;
 
-    Rating.find({}, function (err, ratings) {
-
+    Movie.find({}, function (err, movies) {
         if (err) {
             res.status(500);
-            res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of average ratings per movie could be found.'});
+            res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of movies to get the average ratings of could be found.'});
         }
 
-        //TODO - ASK TEACHER: How to return the average rating sorted per movie in the same response.
-        var amountOfRatings;
-        var average = 0;
+        for (var i = 0; i < movies.length; i++) {
+            //TODO: I THINK THIS FOR LOOP IS COMPLETED FULLY BEFORE FINALLY THE RATING.FIND IS DONE???????
+            //Go through the list of all movies, getting the ratings for each...
+            moviett_number = movies[i].tt_number;
 
-        for (amountOfRatings = 0; amountOfRatings < ratings.length; amountOfRatings++) {
-            average += parseInt(ratings[amountOfRatings].rating);
+            console.log(i + " - " + moviett_number);
+
+            Rating.find({'tt_number': moviett_number}, function (err, movieRatings) {
+                //Get all the ratings for the current movie...
+
+                if (err) {
+                    res.status(500);
+                    res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of average ratings for this movie could be found.'});
+                    return;
+                }
+
+                if (movieRatings > 0) {
+                    //If it has ratings, calculate the average rating.
+                    var amountOfRatings;
+                    var average = 0;
+
+                    for (amountOfRatings = 0; amountOfRatings < movieRatings.length; amountOfRatings++) {
+                        average += parseInt(movieRatings[amountOfRatings].rating);
+                    }
+
+                    average = Math.round((average / amountOfRatings) * 100) / 100;
+
+                    //Add the average rating for this movie to the response jsonString.
+                    obj["The average ratings"].push({
+                        averageRatingMessage: 'Movie with tt_number = [' + moviett_number + '] has the following average rating.',
+                        averageRating: average
+                    });
+                } else {
+                    //Add a notice that this movie does not have any ratings and therefore no average rating either to the response jsonString.
+                    obj["The average ratings"].push({noRatingMessage: 'Movie with tt_number = [' + moviett_number + "] has no ratings yet."});
+                }
+
+                //TODO: WATCH FOR THIS CONSOLE.LOG, IT SHOWS A WEIRD ISSUE.
+                console.log(obj);
+            });
         }
 
-        average = Math.round((average / amountOfRatings) * 100) / 100;
+        jsonString = JSON.stringify(obj);
+
+        //TODO: ASYNCHRONOUS ISSUE, RESPONSE IS SET BEFORE THE CODE ABOVE IS DONE, BECAUSE THE PROGRAM CONTINUES EVEN IF THE FOR LOOP ISN'T DONE YET!
+        console.log(jsonString);
 
         res.status(200);
-        res.json({message: 'How to make this calculate the average for each movie and return it all in one JSON'});
+        res.json(jsonString);
     });
 });
 
