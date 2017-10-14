@@ -3,76 +3,56 @@ const superTest = require('supertest');
 var server = superTest.agent("http://localhost:3000");
 
 describe("Movies unit tests", function () {
-//     //TODO: All tests with server.command("/api/movies/???"). Does it need to be /api/movies/:tt_number or /api/movies/12345 (or any other tt_number)?
-//
-//
     /* -=- All tests for the GET /api/movies routing -=- */
     it("Should return all movies in the system", function (done) {
         server.get("/api/movies")
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-//
+
     /* -=- All tests for the GET /api/movies/:tt_number routing -=- */
     it("Should return a movie with the given tt_number", function (done) {
-        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/2 (or any other number)?
         server.get("/api/movies/123") //Add existing movie number.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-//
+
     it("Should return a 404 NOT FOUND error due to non-existant tt_number", function (done) {
-        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/99999 (or any other number)?
         server.get("/api/movies/NonExistentTtNumber")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
-//
+
     /* -=- All tests for the GET /api/movies/:title routing -=- */
     it("Should return a movie with the given title", function (done) {
         server.get("/api/movies/MovieOne") //Add existing move title.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-//
+
     it("Should return a 404 NOT FOUND as the movie with the given title does not exist", function (done) {
         server.get("/api/movies/MovieTitleThatDoesntExist")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
-//
+
     /* -=- All tests for the GET /api/movies/:director routing -=- */
     it("Should return a movie with the given director", function (done) {
         server.get("/api/movies/DirectorOne") //Add existing director.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-//
+
     it("Should return a 404 NOT FOUND as the movie with the given director does not exist", function (done) {
         server.get("/api/movies/DirectorThatDoesntExist")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 });
+
 //
 describe("Users unit tests", function () {
-    //TODO: All tests with server.command("/api/users/???"). Does it need to be /api/users/:username or /api/movies/slavinski (or any other username)?
-
     /* -=- All tests for the POST /api/users routing -=- */
-    // it("Should create a new user with the given data", function (done) {
-    //     server.post("/api/users")
-    //     //TODO: Send a jason file with the user that you want to create
-    //         .send(({
-    //             "lastname" : "lastname",
-    //             "middlename" : " ",
-    //             "firstname" :"firstname",
-    //             "usern": "UniqueName2", //Username must be unique
-    //             "password": "123456"
-    //         }))
-    //         .expect("Content-type", /json/)
-    //         .expect(201, done);
-    // });
-
     it("Should return a 400 BAD REQUEST as there is a missing password", function (done) {
         server.post("/api/users")
         //TODO: Send a jason file with the user that you want to create
@@ -89,7 +69,6 @@ describe("Users unit tests", function () {
 
     it("Should return a 409 CONFLICT as there is already a user with the given username", function (done) {
         server.post("/api/users")
-        //TODO: Send a jason file with the user that you want to create
             .send(({
                 "lastname" : "lastname",
                 "middlename" : " ",
@@ -112,7 +91,6 @@ describe("Users unit tests", function () {
         server.get("/api/users")
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
             .expect("Content-type", /json/)
-            //TODO: Check that each user's password is not in the response
             .expect(200, done);
     });
 
