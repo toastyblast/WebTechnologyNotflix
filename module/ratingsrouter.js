@@ -8,7 +8,7 @@ var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.get('/', function (req, res) {
-    var jsonString = '{"The average ratings":[]}';
+    var jsonString = '{"theAverageRatings":[]}';
     var obj = JSON.parse(jsonString);
 
     // callback when all your Rating.find() are complete
@@ -45,13 +45,13 @@ router.get('/', function (req, res) {
                     average = Math.round((average / amountOfRatings) * 100) / 100;
 
                     //Add the average rating for this movie to the response jsonString.
-                    obj["The average ratings"].push({
+                    obj["theAverageRatings"].push({
                         averageRatingMessage: 'Movie with tt_number = [' + movie.tt_number + '] has the following average rating.',
                         averageRating: average
                     });
                 } else {
                     //Add a notice that this movie does not have any ratings and therefore no average rating either to the response jsonString.
-                    obj["The average ratings"].push({noRatingMessage: 'Movie with tt_number = [' + movie.tt_number + "] has no ratings yet."});
+                    obj["theAverageRatings"].push({noRatingMessage: 'Movie with tt_number = [' + movie.tt_number + "] has no ratings yet."});
                 }
 
                 // this is the last one, call done()
