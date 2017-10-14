@@ -6,6 +6,7 @@ var movieRouter = require('./module/moviesrouter.js');
 var ratingRouter = require('./module/ratingsrouter.js');
 var userRouter = require('./module/userrouter.js');
 var authenticationRouter = require('./module/authentication.js');
+var setup = require('./model/setup.js');
 
 var app = express();
 
@@ -18,6 +19,7 @@ mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 app.use(bodyParser.json());
 
 //TODO: Use setup.js
+app.use('/api/import/', setup);
 
 /* -=- AUTHENTICATION RELATED ROUTINGS -=- */
 app.use('/api/authenticate/', authenticationRouter);

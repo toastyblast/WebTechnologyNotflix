@@ -3,63 +3,83 @@ const superTest = require('supertest');
 var server = superTest.agent("http://localhost:3000");
 
 describe("Movies unit tests", function () {
+//     //TODO: All tests with server.command("/api/movies/???"). Does it need to be /api/movies/:tt_number or /api/movies/12345 (or any other tt_number)?
+//
+//
     /* -=- All tests for the GET /api/movies routing -=- */
     it("Should return all movies in the system", function (done) {
         server.get("/api/movies")
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-
+//
     /* -=- All tests for the GET /api/movies/:tt_number routing -=- */
     it("Should return a movie with the given tt_number", function (done) {
+        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/2 (or any other number)?
         server.get("/api/movies/123") //Add existing movie number.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-
+//
     it("Should return a 404 NOT FOUND error due to non-existant tt_number", function (done) {
+        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/99999 (or any other number)?
         server.get("/api/movies/NonExistentTtNumber")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
-
+//
     /* -=- All tests for the GET /api/movies/:title routing -=- */
     it("Should return a movie with the given title", function (done) {
         server.get("/api/movies/The Lego Movie") //Add existing move title.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-
+//
     it("Should return a 404 NOT FOUND as the movie with the given title does not exist", function (done) {
         server.get("/api/movies/MovieTitleThatDoesntExist")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
-
+//
     /* -=- All tests for the GET /api/movies/:director routing -=- */
     it("Should return a movie with the given director", function (done) {
-        server.get("/api/movies/Leg Godt") //Add existing director.
+        server.get("/api/movies/BootLeg Godt") //Add existing director.
             .expect("Content-type", /json/)
             .expect(200, done);
     });
-
+//
     it("Should return a 404 NOT FOUND as the movie with the given director does not exist", function (done) {
         server.get("/api/movies/DirectorThatDoesntExist")
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 });
-
 //
 describe("Users unit tests", function () {
+    //TODO: All tests with server.command("/api/users/???"). Does it need to be /api/users/:username or /api/movies/slavinski (or any other username)?
+
     /* -=- All tests for the POST /api/users routing -=- */
+    it("Should create a new user with the given data", function (done) {
+        server.post("/api/users")
+        //TODO: Send a jason file with the user that you want to create
+            .send(({
+                "lastname" : "Test User Last Name",
+                "middlename" : " ",
+                "firstname" :"Test User First Name",
+                "usern": "Test User Username", //Username must be unique
+                "password": "123456"
+            }))
+            .expect("Content-type", /json/)
+            .expect(201, done);
+    });
+
     it("Should return a 400 BAD REQUEST as there is a missing password", function (done) {
         server.post("/api/users")
         //TODO: Send a jason file with the user that you want to create
             .send(({
-                "lastname" : "LastName",
+                "lastname" : "Test User Last Name",
                 "middlename" : " ",
-                "firstname" :"FirstName",
+                "firstname" :"Test User First Name",
                 "usern": "UniqueName", //username must be unique
                 "password": ""
             }))
@@ -69,11 +89,12 @@ describe("Users unit tests", function () {
 
     it("Should return a 409 CONFLICT as there is already a user with the given username", function (done) {
         server.post("/api/users")
+        //TODO: Send a jason file with the user that you want to create
             .send(({
-                "lastname" : "lastname",
-                "middlename" : "",
-                "firstname" :"firstname",
-                "usern": "toastyblast", //Username must be non-unique in this test
+                "lastname" : "Test User Last Name",
+                "middlename" : " ",
+                "firstname" :"Test User First Name",
+                "usern": "Test User Username", //Username must exist.
                 "password": "password"
             }))
             .expect("Content-type", /json/)
@@ -89,8 +110,9 @@ describe("Users unit tests", function () {
 
     it("Should return all users in the system (without password)", function (done) {
         server.get("/api/users")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
+            //TODO: Check that each user's password is not in the response
             .expect(200, done);
     });
 
@@ -102,44 +124,43 @@ describe("Users unit tests", function () {
     });
 
     it("Should return a specific user (without password) with the given username", function (done) {
-        server.get("/api/users/user/UniqueName2")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
+        server.get("/api/users/user/skellyton")
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
-            .expect(200, {
-                "last_name": "lastname",
-                "middle_name": " ",
-                "first_name": "firstname",
-                "username": "username",
-                "__v": 0,
-                "favourites": [
-                    "MovieOne",
-                    "Title of the movie"
-                ]
-            },done);
+            .expect(200, [
+                {
+                    "last_name": "Deurie",
+                    "middle_name": "Bonkie",
+                    "first_name": "Martyni",
+                    "username": "skellyton",
+                    "__v": 0,
+                    "favourites": []
+                }
+            ],done);
     });
 
     it("Should return a 404 NOT FOUND as the user with the given username could not be found", function (done) {
         server.get("/api/users/user/UniqueUser3")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 
     it("Should return a list with the amount of users that was specified", function (done) {
         server.get("/api/users/2")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
             .expect(200,
                 [
                     {
                         "last_name": "Slavov",
                         "first_name": "Martin",
-                        "username": "sswxyz2"
+                        "username": "sswxyz17"
                     },
                     {
-                        "last_name": "lastname",
-                        "first_name": "firstname",
-                        "username": "username"
+                        "last_name": "Kerbusch",
+                        "first_name": "Yoran",
+                        "username": "toastyblast"
                     }
                 ]
                 ,done);
@@ -147,7 +168,7 @@ describe("Users unit tests", function () {
 
     it("Should return 400 BAD REQUEST because the value that was passed was not a number",function (done) {
         server.get("/api/users/a")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZWxrbyIsImlhdCI6MTUwNzk4NTYyMiwiZXhwIjoxNTA4MDcyMDIyfQ.MszoU_wvtU58th2xZG5sv-Gk656NwtCKNWkwjd5gAyU"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
             .expect(400, done);
     });
@@ -159,27 +180,25 @@ describe("Users unit tests", function () {
     });
 
     it("Should add a movie to the favorites of the user",function (done) {
-        server.put("/api/users/favourites/Title of the movie")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVuaXF1ZU5hbWUyIiwiaWF0IjoxNTA3OTk0MDk5LCJleHAiOjE1MDgwODA0OTl9.9TiATypcc_pSKqvAYqIGFBfCx5CUJaYzlz-71YceJBs"})
+        server.put("/api/users/favourites/The Lego Movie")
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
             .expect(200, {
-                "_id": "59e221c5e89ce012cc0b90fd",
-                "last_name": "lastname",
-                "middle_name": " ",
-                "first_name": "firstname",
-                "username": "UniqueName2",
-                "passwords": "123456",
+                "last_name": "Slavov",
+                "middle_name": "Slavinov",
+                "first_name": "Martin",
+                "username": "sswxyz17",
+                "passwords": "peanuts",
                 "__v": 0,
                 "favourites": [
-                    "MovieOne",
-                    "Title of the movie"
+                    "The Lego Movie"
                 ]
             }, done);
     });
 
     it("Should give ERROR 404 DOES NOT EXIST because you are trying to favorite a non-existing movie.",function (done) {
         server.put("/api/users/favourites/MovieThatDoesntExist")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVuaXF1ZU5hbWUyIiwiaWF0IjoxNTA3OTk0MDk5LCJleHAiOjE1MDgwODA0OTl9.9TiATypcc_pSKqvAYqIGFBfCx5CUJaYzlz-71YceJBs"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
