@@ -14,10 +14,10 @@ app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 //Start the Mongoose connection.
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 
-//TODO: Use setup.js
-
 //Parse the body of HTTP request and transform it to JSON.
 app.use(bodyParser.json());
+
+//TODO: Use setup.js
 
 /* -=- AUTHENTICATION RELATED ROUTINGS -=- */
 app.use('/api/authenticate/', authenticationRouter);

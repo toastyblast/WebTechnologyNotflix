@@ -7,6 +7,48 @@ var Movie = require('../model/movies.js');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
+var post4 = new User({
+    last_name: 'Slavov',
+    middle_name: 'Slavinov',
+    first_name: 'Martin',
+    username: 'sswxyz17',
+    passwords: 'peanuts'
+});
+
+post4.save(function (err, result) {
+    if (err) {
+        return console.error(err);
+    }
+});
+
+var post5 = new User({
+    last_name: 'Kerbusch',
+    middle_name: '',
+    first_name: 'Yoran',
+    username: 'toastyblast',
+    passwords: 'cheese'
+});
+
+post5.save(function (err, result) {
+    if (err) {
+        return console.error(err);
+    }
+});
+
+var post6 = new User({
+    last_name: 'Deurie',
+    middle_name: 'Bonkie',
+    first_name: 'Martyni',
+    username: 'skellyton',
+    passwords: 'b0nk3rs'
+});
+
+post6.save(function (err, result) {
+    if (err) {
+        return console.error(err);
+    }
+});
+
 router.post('/', function (req, res) {
     if (req.body.password.length < 4) {
         res.status(400);
