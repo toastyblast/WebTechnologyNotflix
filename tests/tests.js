@@ -119,11 +119,56 @@ describe("Users unit tests", function () {
 describe("Ratings unit tests", function () {
     //TODO: All tests with the server.command("/api/ratings/???"). Should these be filled in with :value or an actual value (like slavinski or 12345)?
 
-    /* -=- All tests for the GET /api/ratings routing -=- */
+    /* -=- All tests for the GET /api/ratings/ routing -=- */
     it("Should return a list of average ratings per movie", function (done) {
-        server.get("/api/ratings")
+        server.get("/api/ratings/")
             .expect("Content-type", /jason/)
             .expect(200, done);
+    });
+
+    /* -=- All tests for the GET /api/ratings/:tt_number routing -=- */
+    it("Should show the average rating for the movie with the given tt_number", function (done) {
+        server.get("/api/ratings/123")
+            .expect("Content-type", /jason/)
+            .expect(200, done);
+    });
+
+    it("Should return a 404 NOT FOUND if there is no movie with the given tt_number", function (done) {
+        server.get("/api/ratings/147")
+            .expect("Content-type", /jason/)
+            .expect(404, done);
+    });
+
+    /* -=- All tests for the GET /api/ratings/:username routing -=- */
+    it("Should show the average rating for the movie with the given tt_number", function (done) {
+        server.get("/api/ratings/???")
+            .expect("Content-type", /jason/)
+            .expect(200, done);
+    });
+
+    it("Should return a 404 NOT FOUND if there is no movie with the given tt_number", function (done) {
+        server.get("/api/ratings/???")
+            .expect("Content-type", /jason/)
+            .expect(404, done);
+    });
+
+    /* -=- All tests for the GET /api/ratings/:username/:tt_number routing -=- */
+    it("Should return a 403 FORBIDDEN as the client is not logged in and thus not allowed to view a specific rating", function (done) {
+        server.get("/api/ratings/???&???")
+            .expect("Content-type", /jason/)
+            .expect(403, done);
+    });
+
+    it("Should return the rating of the logged in user from the movie with the given tt_number", function (done) {
+        server.get("/api/ratings/???&???")
+            .expect("Content-type", /jason/)
+            .expect(200, done);
+    });
+
+    it("Should return a 404 NOT FOUND if there is no rating made by that user for the movie with the given tt_number", function (done) {
+        server.get("/api/ratings/???&???")
+            .expect("Content-type", /jason/)
+            .expect(404, done);
     });
 
     /* -=- All tests for the POST /api/ratings routing -=- */
@@ -199,38 +244,6 @@ describe("Ratings unit tests", function () {
 
     it("Should return a 404 NOT FOUND if there's not a movie with the given tt_number and username", function (done) {
         server.delete("/api/ratings/???&???")
-            .expect("Content-type", /jason/)
-            .expect(404, done);
-    });
-
-    /* -=- All tests for the GET /api/ratings/:tt_number routing -=- */
-    it("Should show the average rating for the movie with the given tt_number", function (done) {
-        server.get("/api/ratings/???")
-            .expect("Content-type", /jason/)
-            .expect(200, done);
-    });
-
-    it("Should return a 404 NOT FOUND if there is no movie with the given tt_number", function (done) {
-        server.get("/api/ratings/???")
-            .expect("Content-type", /jason/)
-            .expect(404, done);
-    });
-
-    /* -=- All tests for the GET /api/ratings/:username&:tt_number routing -=- */
-    it("Should return a 403 FORBIDDEN as the client is not logged in and thus not allowed to view a specific rating", function (done) {
-        server.get("/api/ratings/???&???")
-            .expect("Content-type", /jason/)
-            .expect(403, done);
-    });
-
-    it("Should return the rating of the logged in user from the movie with the given tt_number", function (done) {
-        server.get("/api/ratings/???&???")
-            .expect("Content-type", /jason/)
-            .expect(200, done);
-    });
-
-    it("Should return a 404 NOT FOUND if there is no rating made by that user for the movie with the given tt_number", function (done) {
-        server.get("/api/ratings/???&???")
             .expect("Content-type", /jason/)
             .expect(404, done);
     });

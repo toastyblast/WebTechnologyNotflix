@@ -261,7 +261,7 @@ router.use(function (req, res, next) {
 
     if (giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
 
-        if (givenRating > 0.0 && givenRating <= 5.0) {
+        if (givenRating >= 0.0 && givenRating <= 5.0) {
             //Make sure the givenRating is between (non-including) 0.0 and (including) 5.0
 
             //Make sure that the givenRating only has one decimal, we can forgive the user for giving more decimals...
