@@ -175,7 +175,7 @@ router.get('/:username/:tt_number', function (req, res) {
 
         if (tokenUsername === username) {
             //Check if the authorized user is the user they are requesting to see.
-            Rating.find({'username': username, 'tt_number': tt_number}, function (err, rating) {
+            Rating.find({'username': username, 'tt_number': tt_number}, {'_id':0, '__v':0}, function (err, rating) {
 
                 if (err) {
                     res.status(500);
