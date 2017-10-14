@@ -7,48 +7,6 @@ var Movie = require('../model/movies.js');
 var jwt = require('jsonwebtoken');
 var router = express.Router();
 
-var post4 = new User({
-    last_name: 'Slavov',
-    middle_name: 'Slavinov',
-    first_name: 'Martin',
-    username: 'sswxyz17',
-    passwords: 'peanuts'
-});
-
-post4.save(function (err, result) {
-    if (err) {
-        return console.error(err);
-    }
-});
-
-var post5 = new User({
-    last_name: 'Kerbusch',
-    middle_name: '',
-    first_name: 'Yoran',
-    username: 'toastyblast',
-    passwords: 'cheese'
-});
-
-post5.save(function (err, result) {
-    if (err) {
-        return console.error(err);
-    }
-});
-
-var post6 = new User({
-    last_name: 'Deurie',
-    middle_name: 'Bonkie',
-    first_name: 'Martyni',
-    username: 'skellyton',
-    passwords: 'b0nk3rs'
-});
-
-post6.save(function (err, result) {
-    if (err) {
-        return console.error(err);
-    }
-});
-
 router.post('/', function (req, res) {
     if (req.body.password.length < 4) {
         res.status(400);
@@ -108,7 +66,7 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
-    User.find({}, {'last_name': 1, 'first_name': 1, 'username': 1, '_id': 0 , 'favourites' : 1}, function (err, users) {
+    User.find({}, {'_id': 0 , 'passwords': 0}, function (err, users) {
         if (err) {
             res.status(500);
             res.json({errorMessage: 'No list of users could be found in the database.'});
@@ -119,8 +77,8 @@ router.get('/', function (req, res) {
     });
 });
 
-router.get('/user/:usern', function (req, res) {
-    User.find({'username': req.params.usern}, function (err, users) {
+router.get('/:usern', function (req, res) {
+    User.find({'username': req.params.usern}, {'_id':0, 'passwords':0}, function (err, users) {
         if (err) {
             res.status(500);
             res.json({errorMessage: 'No list of users could be found in the database.'});
@@ -134,7 +92,7 @@ router.get('/user/:usern', function (req, res) {
     })
 });
 
-router.get('/users/:limitresult', function (req, res) {
+router.get('/:limitresult', function (req, res) {
     if (isNaN(req.params.limitresult)) {
         res.status(400);
         res.json('Please enter a number to specify how many users you want to see.');
