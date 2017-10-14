@@ -82,6 +82,7 @@ router.post('/', function (req, res) {
                         });
                     }
                 }
+                res.json(err);
             } else {
                 res.json(result);
             }
@@ -153,6 +154,7 @@ router.get('/users/:limitresult', function (req, res) {
 router.put('/favourites/:movie', function (req, res) {
     var tokenUsername = req.app.locals.decoded.username;
     console.log(tokenUsername);
+    var userfound;
 
     function three(callback) {
         Movie.find({title: req.params.movie}, function (err, movies) {
@@ -181,6 +183,7 @@ router.put('/favourites/:movie', function (req, res) {
             } else {
                 // console.log(users);
                 userfound = users[0];
+                // console.log(userfound);
                 callback();
             }
         });
@@ -188,8 +191,8 @@ router.put('/favourites/:movie', function (req, res) {
 
     //TODO: Maybe find a way to show the user that the movie, that he is trying to add is already in favourites.
     function two(smth, callback) {
-        console.log(smth._id);
-        User.findOneAndUpdate(smth._id, { $addToSet: { favourites: req.params.movie}}, { new: true }, function (err, user) {
+        console.log(userfound);
+        User.findByIdAndUpdate(userfound._id, { $addToSet: { favourites: req.params.movie}}, { new: true }, function (err, user) {
             if (err)
             {
                 res.json(err);
