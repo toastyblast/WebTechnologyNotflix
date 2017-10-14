@@ -40,7 +40,6 @@ router.post('/', function (req, res) {
                         });
                     }
                 }
-                res.json(err);
             } else {
                 res.json(result);
             }
@@ -121,7 +120,7 @@ router.put('/favourites/:movie', function (req, res) {
                 res.json({errorMessage: 'No list of movies could be found in the database.'});
                 return console.error(err);
             } else if (movies.length === 0) {
-                res.status(500);
+                res.status(404);
                 res.json({errorMessage: 'You cannot add a movie that does not exist in our DB.'});
             } else {
                 callback();
