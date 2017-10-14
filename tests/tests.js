@@ -183,7 +183,11 @@ describe("Users unit tests", function () {
         server.put("/api/users/favourites/The Lego Movie")
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
+            .expect(function (res) {
+                res.body._id = '1';
+            })
             .expect(200, {
+                "_id": "1",
                 "last_name": "Slavov",
                 "middle_name": "Slavinov",
                 "first_name": "Martin",
