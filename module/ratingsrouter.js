@@ -10,31 +10,30 @@ var router = express.Router();
 router.get('/', function (req, res) {
     var jsonString = '{"The average ratings":[]}';
     var obj = JSON.parse(jsonString);
-    var moviett_number;
 
+    // callback when all your Rating.find() are complete
+    function done(obj) {
+        res.status(200);
+        res.json(obj);
+    }
+
+    // get the movies
     Movie.find({}, function (err, movies) {
         if (err) {
             res.status(500);
             res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of movies to get the average ratings of could be found.'});
         }
-
-        for (var i = 0; i < movies.length; i++) {
-            //TODO: I THINK THIS FOR LOOP IS COMPLETED FULLY BEFORE FINALLY THE RATING.FIND IS DONE???????
-            //Go through the list of all movies, getting the ratings for each...
-            moviett_number = movies[i].tt_number;
-
-            console.log(i + " - " + moviett_number);
-
-            Rating.find({'tt_number': moviett_number}, function (err, movieRatings) {
-                //Get all the ratings for the current movie...
-
+        // loop over the results
+        movies.forEach(function(movie, i) {
+            // get the Rating for this Movie
+            Rating.find({'tt_number': movie.tt_number}, function (err, movieRatings) {
                 if (err) {
                     res.status(500);
                     res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of average ratings for this movie could be found.'});
                     return;
                 }
 
-                if (movieRatings > 0) {
+                if (movieRatings.length > 0) {
                     //If it has ratings, calculate the average rating.
                     var amountOfRatings;
                     var average = 0;
@@ -47,26 +46,20 @@ router.get('/', function (req, res) {
 
                     //Add the average rating for this movie to the response jsonString.
                     obj["The average ratings"].push({
-                        averageRatingMessage: 'Movie with tt_number = [' + moviett_number + '] has the following average rating.',
+                        averageRatingMessage: 'Movie with tt_number = [' + movie.tt_number + '] has the following average rating.',
                         averageRating: average
                     });
                 } else {
                     //Add a notice that this movie does not have any ratings and therefore no average rating either to the response jsonString.
-                    obj["The average ratings"].push({noRatingMessage: 'Movie with tt_number = [' + moviett_number + "] has no ratings yet."});
+                    obj["The average ratings"].push({noRatingMessage: 'Movie with tt_number = [' + movie.tt_number + "] has no ratings yet."});
                 }
 
-                //TODO: WATCH FOR THIS CONSOLE.LOG, IT SHOWS A WEIRD ISSUE.
-                console.log(obj);
+                // this is the last one, call done()
+                if (movies.length-1 === i) {
+                    done(obj);
+                }
             });
-        }
-
-        jsonString = JSON.stringify(obj);
-
-        //TODO: ASYNCHRONOUS ISSUE, RESPONSE IS SET BEFORE THE CODE ABOVE IS DONE, BECAUSE THE PROGRAM CONTINUES EVEN IF THE FOR LOOP ISN'T DONE YET!
-        console.log(jsonString);
-
-        res.status(200);
-        res.json(jsonString);
+        })
     });
 });
 
