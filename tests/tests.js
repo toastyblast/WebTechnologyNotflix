@@ -116,12 +116,46 @@ var server = superTest.agent("http://localhost:3000");
 //     });
 // });
 
-describe("Ratings unit tests", function () {
+describe("Authorization routing tests", function () {
+    it("Should not generate a token if the request body is undefined or incorrect (400)", function (done) {
+        var credentials = {'userna':'toastyblast', 'pawords':'cheese'};
+
+        server.post('/api/authenticate/')
+            .send(credentials)
+            .expect('Content-Length', '92') //Length of the correct error message.
+            .expect(400, done);
+    });
+
+    it("Should not generate a token if the username does not even exist (404)", function (done) {
+        var credentials = {'username':'toasty', 'passwords':'cheese'};
+
+        server.post('/api/authenticate/')
+            .send(credentials)
+            .expect('Content-Length', '70') //Length of the correct error message.
+            .expect(404, done);
+    });
+
+    it("Should not generate a token if the username + password combination is wrong (400)", function (done) {
+        var credentials = {'username':'toastyblast', 'passwords':'kaas'};
+
+        server.post('/api/authenticate/')
+            .send(credentials)
+            .expect('Content-Length', '83') //Length of the correct error message.
+            .expect(400, done);
+    });
+});
+
+describe("Ratings routings tests", function () {
     /* -=- All tests for the GET /api/ratings/ routing -=- */
     it("Should return a list of average ratings per movie", function (done) {
         server.get("/api/ratings/")
             .expect("Content-type", /json/)
-            .expect(200, done);
+            .expect(function (res) {
+                res.body.theAverageRatings = [];
+            })
+            .expect(200, {
+                'theAverageRatings':[] //Check if the body actually has an averageRatingsArray. We do not care about the contents, as those can be different for everyone testing this REST service.
+            }, done);
     });
 
     /* -=- All tests for the GET /api/ratings/:tt_number routing -=- */
@@ -156,16 +190,49 @@ describe("Ratings unit tests", function () {
     });
 
     it("Should show the ratings for the user with that username", function (done) {
-        //TODO: Provide a token with the right username in the body as JSON.
         server.get("/api/ratings/toastyblast")
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
             .expect("Content-type", /json/)
+            //We cannot truly check what's inside of the response as this may be different for every user of this RESTful service, if they changed anything.
             .expect(200, done);
     });
 
-    it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
-        //TODO: Provide a token with right the username in the body as JSON.
-        server.get("/api/ratings/markiplier")
+    //TODO: needs a new user with no ratings created.
+    // it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
+    //     //TODO: Provide a token with right the username in the body as JSON.
+    //     server.get("/api/ratings/markiplier")
+    //         .expect("Content-type", /json/)
+    //         .expect(404, done);
+    // });
+
+    it("Should show nothing as the user has no token (403)", function (done) {
+        server.get("/api/ratings/toastyblast") //Different user than the token holder.
             .expect("Content-type", /json/)
+            .expect('Content-Length', '136') //Length of the appropriate error message.
+            .expect(403, done);
+    });
+
+    it("Should not show a specific movie's rating from a different user than the one logged in (403)", function (done) {
+        server.get("/api/ratings/sswxyz17/123") //Different user than the token holder.
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .expect("Content-type", /json/)
+            .expect('Content-Length', '101') //Length of the appropriate error message.
+            .expect(400, done);
+    });
+
+    it("Should let the user know when they do not have a rating for that specific movie tt_number (404)", function (done) {
+        server.get("/api/ratings/toastyblast/456") //Different user than the token holder.
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .expect("Content-type", /json/)
+            .expect('Content-Length', '121') //Length of the appropriate error message.
             .expect(404, done);
+    });
+
+    it("Should return the logged in user's rating for a specific movie with the tt_number", function (done) {
+        server.get("/api/ratings/toastyblast/123") //Different user than the token holder.
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .expect("Content-type", /json/)
+            //TODO: Check if the right content is there.
+            .expect(200, done);
     });
 });

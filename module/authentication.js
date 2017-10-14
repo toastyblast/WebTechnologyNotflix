@@ -23,8 +23,8 @@ router.post('/', function (req, res) {
                     res.json({'token': token})
                 }
                 else {
-                    res.status(403);
-                    res.json({errorMessage: '403 BAD REQUEST - Your username + password combination is wrong.'})
+                    res.status(400);
+                    res.json({errorMessage: '400 BAD REQUEST - Your username + password combination is wrong.'})
                 }
             } else {
                 res.status(404);
@@ -32,8 +32,8 @@ router.post('/', function (req, res) {
             }
         });
     } else {
-        res.status(403);
-        res.json({errorMessage: '403 BAD REQUEST - You are not defining certain required data (correctly).'})
+        res.status(400);
+        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly).'})
     }
 });
 
