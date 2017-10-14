@@ -9,91 +9,109 @@ var router = express.Router();
 //TODO: Find a way to have these search just on a part of a director's name or movie title (so less specific), and without case sensitivity. (So "title of" and "director of" should return the movie as well, and not only "Title of the movie" and "Director of the movie").
 
 router.get('/', function (req, res) {
-    Movie.find({}, function (err, movies) {
+    var jsonString = '{"Movies":[]}';
+    var obj = JSON.parse(jsonString);
+    var allmovies;
+    console.log(req.query.title);
+    if (req.query.title !== undefined){
+        Movie.find({}, function (err, movies) {
 
-        if (err) {
-            res.status(500);
-            res.json({errorMessage: 'No list of movies could be found in the database.'});
-            return console.error(err);
-        }
-
-        res.status(200);
-        res.json(movies);
-    })
-});
-
-router.get('/:search', function (req, res) {
-
-    function findTitle(value, callback) {
-        Movie.find({title: value}, function (err, movies) {
             if (err) {
                 res.status(500);
                 res.json({errorMessage: 'No list of movies could be found in the database.'});
                 return console.error(err);
-            } else if (movies.length > 0) {
-                res.json(movies);
-            } else {
-                callback();
             }
-        });
-    }
 
-    function findDirector(value, callback) {
-        Movie.find({director: value}, function (err, movies) {
-            if (err) {
-                res.status(500);
-                res.json({errorMessage: 'No list of movies could be found in the database.'});
-                return console.error(err);
-            } else if (movies.length > 0) {
-                res.json(movies);
-            } else {
-                callback();
-            }
-        });
-    }
-
-    function findTTNumber(value, callback) {
-        Movie.find({tt_number: value}, function (err, movies) {
-            if (err) {
-                res.status(500);
-                res.json({errorMessage: 'No list of movies could be found in the database.'});
-                return console.error(err);
-            } else if (movies.length > 0) {
-                res.json(movies);
-            } else {
-                callback();
-            }
-        });
-    }
-
-    function showMessage(callback) {
-        res.status(404);
-        res.json('ERROR 404 - There is no such movie.');
-    }
-
-    var query = req.params.search;
-
-    if (isNaN(query)) {
-
-        findTitle(query, function () {
-            findDirector(query, function () {
-                showMessage(function () {
-
-                })
-            });
-        });
-
-    } else {
-
-        findTTNumber(query, function () {
-            showMessage(function () {
-
+            movies.forEach(function(movie, i){
+                var title = movie.title;
+                console.log(movie);
+                if (title.toLowerCase().indexOf(req.query.title.toLowerCase()) !== -1) {
+                    obj["Movies"].push({
+                        tt_number : movie.tt_number,
+                        title : movie.title,
+                        date : movie.publication_date,
+                        length : movie.length,
+                        director : movie.director,
+                        description : movie.description
+                    });
+                }
+                if (movies.length-1 === i) {
+                    res.json(obj);
+                }
             })
         });
+    } else if (req.query.director !== undefined) {
+        console.log("hi");
+        Movie.find({}, function (err, movies) {
 
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            }
+
+            movies.forEach(function(movie, i){
+                var title = movie.director;
+                console.log(title);
+                if (title.toLowerCase().indexOf(req.query.director.toLowerCase()) !== -1) {
+                    obj["Movies"].push({
+                        tt_number : movie.tt_number,
+                        title : movie.title,
+                        date : movie.publication_date,
+                        length : movie.length,
+                        director : movie.director,
+                        description : movie.description
+                    });
+                }
+                if (movies.length-1 === i) {
+                    res.json(obj);
+                }
+            })
+        });
+    } else if (req.query.description !== undefined){
+        Movie.find({}, function (err, movies) {
+
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            }
+
+            movies.forEach(function(movie, i){
+                var title = movie.description;
+                console.log(title);
+                if (title.toLowerCase().indexOf(req.query.description.toLowerCase()) !== -1) {
+                    obj["Movies"].push({
+                        tt_number : movie.tt_number,
+                        title : movie.title,
+                        date : movie.publication_date,
+                        length : movie.length,
+                        director : movie.director,
+                        description : movie.description
+                    });
+                }
+                if (movies.length-1 === i) {
+                    res.json(obj);
+                }
+            })
+        });
+    } else {
+        Movie.find({}, function (err, movies) {
+
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            }
+
+            res.status(200);
+            res.json(movies);
+        })
     }
 
 
+
 });
+
 
 module.exports = router;
