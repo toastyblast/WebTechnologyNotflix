@@ -77,7 +77,7 @@ router.get('/', function (req, res) {
     });
 });
 
-router.get('/:usern', function (req, res) {
+router.get('/user/:usern', function (req, res) {
     User.find({'username': req.params.usern}, {'_id':0, 'passwords':0}, function (err, users) {
         if (err) {
             res.status(500);
