@@ -6,13 +6,9 @@ var User = require('../model/user.js');
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
 var router = express.Router();
 
-
 var server = superTest.agent("http://localhost:3000");
 
 describe("Movies unit tests", function () {
-//     //TODO: All tests with server.command("/api/movies/???"). Does it need to be /api/movies/:tt_number or /api/movies/12345 (or any other tt_number)?
-//
-//
     /* -=- All tests for the GET /api/movies routing -=- */
     it("Should return all movies in the system", function (done) {
         server.get("/api/movies")
@@ -91,12 +87,9 @@ describe("Movies unit tests", function () {
 });
 
 describe("Users unit tests", function () {
-    //TODO: All tests with server.command("/api/users/???"). Does it need to be /api/users/:username or /api/movies/slavinski (or any other username)?
-
     /* -=- All tests for the POST /api/users routing -=- */
     it("Should create a new user with the given data", function (done) {
         server.post("/api/users")
-        //TODO: Send a jason file with the user that you want to create
             .send(({
                 "lastname" : "Test User Last Name",
                 "middlename" : " ",
@@ -110,7 +103,6 @@ describe("Users unit tests", function () {
 
     it("Should return a 400 BAD REQUEST as there is a missing password", function (done) {
         server.post("/api/users")
-        //TODO: Send a jason file with the user that you want to create
             .send(({
                 "lastname" : "Test User Last Name",
                 "middlename" : " ",
@@ -124,7 +116,6 @@ describe("Users unit tests", function () {
 
     it("Should return a 409 CONFLICT as there is already a user with the given username", function (done) {
         server.post("/api/users")
-        //TODO: Send a jason file with the user that you want to create
             .send(({
                 "lastname" : "Test User Last Name",
                 "middlename" : " ",
@@ -153,7 +144,6 @@ describe("Users unit tests", function () {
         server.get("/api/users")
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
-            //TODO: Check that each user's password is not in the response
             .expect(200, done);
         mongoose.connection.close();
     });
@@ -192,9 +182,7 @@ describe("Users unit tests", function () {
         server.get("/api/users/2")
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
-            .expect(200
-
-                ,done);
+            .expect(200, done);
     });
 
     it("Should return 400 BAD REQUEST because the value that was passed was not a number",function (done) {
@@ -243,14 +231,13 @@ describe("Users unit tests", function () {
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVuaXF1ZU5hbSIsImlhdCI6MTUwNzk5NDA5OSwiZXhwIjoxNTA4MDgwNDk5fQ.hd4TXqY0zaIpr4J71v4uNMeNgZ1AckcGY8K4gMWFdDQ"})
             .expect("Content-type", /json/)
             .expect(404, done);
-    })
+    });
 
     it("Should give ERROR 403 DOES NOT EXIST because the user cannot add favourites while not logged in.",function (done) {
         server.put("/api/users/favourites/MovieOne")
             .expect("Content-type", /json/)
             .expect(403, done);
-    })
-
+    });
 });
 
 describe("Authorization routing tests", function () {
@@ -280,7 +267,18 @@ describe("Authorization routing tests", function () {
             .expect('Content-Length', '83') //Length of the correct error message.
             .expect(400, done);
     });
+
+    it("Should generate a token if the username + password combination is correct (201)", function (done) {
+        var credentials = {'username':'toastyblast', 'passwords':'cheese'};
+
+        server.post('/api/authenticate/')
+            .send(credentials)
+            .expect('Content-type', /json/) //Length of the correct error message.
+            .expect(201, done);//We can't check for much more as a length of a token is always random due to the date when it expires being included too.
+    });
 });
+
+var correctAuthenticationCode = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA4MDc4NjEzLCJleHAiOjE1MTA0OTc4MTN9.aHsJeREumlkykoOtEhckC7DIZndVtRdVi6gnA6KOrZI'; //Auth token for toastyblast
 
 describe("Ratings routings tests", function () {
     /* -=- All tests for the GET /api/ratings/ routing -=- */
@@ -320,7 +318,7 @@ describe("Ratings routings tests", function () {
     /* -=- All tests for the GET /api/ratings/:username routing & authorization integrity checks -=- */
     it("Should not show the ratings of a different user than the one logged in (400)", function (done) {
         server.get("/api/ratings/toastyblast")
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTkxMzgwLCJleHAiOjE1MDgwNzc3ODB9.y56UEBjW51FNgksHu3e5HA4FGcWodWeFxnRnYMKPGsw') //This is the auth token of sswxyz17, not toastyblast
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDc5MTgwLCJleHAiOjE1MTA0OTgzODB9.NpJmhsbbMshdyp4i-G1UX4zlHxqAyM0Kz7qnB5xdh-4') //This is the auth token of sswxyz17, not toastyblast
             .expect("Content-type", /json/)
             .expect("Content-Length", "104") //Exact length of the error message given when the token is wrong.
             .expect(400, done);
@@ -328,19 +326,19 @@ describe("Ratings routings tests", function () {
 
     it("Should show the ratings for the user with that username", function (done) {
         server.get("/api/ratings/toastyblast")
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast.set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             //We cannot truly check what's inside of the response as this may be different for every user of this RESTful service, if they changed anything.
             .expect(200, done);
     });
 
-    //TODO: needs a new user with no ratings created.
-    // it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
-    //     //TODO: Provide a token with right the username in the body as JSON.
-    //     server.get("/api/ratings/markiplier")
-    //         .expect("Content-type", /json/)
-    //         .expect(404, done);
-    // });
+    it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
+        server.get("/api/ratings/markiplier") //This user should have no ratings yet
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtpcGxpZXIiLCJpYXQiOjE1MDgwNzk0NzAsImV4cCI6MTUxMDQ5ODY3MH0.P3ZC1Xsh3Mh26m08pBVKa0UdPcx9ytSJ-AvQfj_jExk') //Auth token for markiplier
+            .expect("Content-type", /json/)
+            .expect('Content-Length', '72') //Length of the correct code.
+            .expect(404, done);
+    });
 
     it("Should show nothing as the user has no token (403)", function (done) {
         server.get("/api/ratings/toastyblast") //Different user than the token holder.
@@ -351,7 +349,7 @@ describe("Ratings routings tests", function () {
 
     it("Should not show a specific movie's rating from a different user than the one logged in (403)", function (done) {
         server.get("/api/ratings/sswxyz17/123") //Different user than the token holder.
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect('Content-Length', '101') //Length of the appropriate error message.
             .expect(400, done);
@@ -359,7 +357,7 @@ describe("Ratings routings tests", function () {
 
     it("Should let the user know when they do not have a rating for that specific movie tt_number (404)", function (done) {
         server.get("/api/ratings/toastyblast/456") //Different user than the token holder.
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect('Content-Length', '121') //Length of the appropriate error message.
             .expect(404, done);
@@ -367,7 +365,7 @@ describe("Ratings routings tests", function () {
 
     it("Should return the logged in user's rating for a specific movie with the tt_number", function (done) {
         server.get("/api/ratings/toastyblast/123") //Different user than the token holder.
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect(function (res) {
                 res.body[0].rating = 3.5;
@@ -388,7 +386,7 @@ describe("Ratings routings tests", function () {
         var ratingToAdd = {'tt_numb':123, 'rate':4.5};
 
         server.post('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
             .expect('Content-Length', '157') //Length of the appropriate error message.
             .expect(400, done);
@@ -400,7 +398,7 @@ describe("Ratings routings tests", function () {
         var ratingToAdd = {'tt_number':123, 'rating':6.5};
 
         server.post('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
             .expect('Content-Length', '117') //Length of the appropriate error message.
             .expect(400, done);
@@ -412,7 +410,7 @@ describe("Ratings routings tests", function () {
         var ratingToAdd = {'tt_number':123, 'rating':3.3};
 
         server.post('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
             .expect('Content-Length', '78') //Length of the appropriate error message.
             .expect(400, done);
@@ -423,7 +421,7 @@ describe("Ratings routings tests", function () {
         var ratingToAdd = {'tt_number':123, 'rating':4.0}; //Actual rating on tt_number 123 has a score of 4.5
 
         server.post('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
             .expect('Content-Length', '120') //Length of the appropriate error message.
             .expect(409, done);
@@ -434,7 +432,7 @@ describe("Ratings routings tests", function () {
         var ratingToAdd = {'tt_number':456, 'rating':0.5};
 
         server.post('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
             .expect(function (res) {
                 res.body._id = '1'; //These don't matter for the test but still have to be accounted for in the next .expect, so make sure you set them to something easily checked.
@@ -456,7 +454,7 @@ describe("Ratings routings tests", function () {
         var ratingToChange = {'tt_number':1234567890, 'rating':1.0};
 
         server.put('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToChange)
             .expect('Content-Length', '92') //Specific size of the error message for a non-existent rating under this username and/or tt_number
             .expect(404, done);
@@ -467,7 +465,7 @@ describe("Ratings routings tests", function () {
         var ratingToChange = {'tt_number':456, 'rating':1.0};
 
         server.put('/api/ratings/')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToChange)
             .expect('Content-Length', '83') //Specific size of the successfully changed message.
             .expect(200, done);
@@ -477,7 +475,7 @@ describe("Ratings routings tests", function () {
     it("Should delete the logged-in user's rating. (200)", function (done) {
         //Remove the rating we made in the POST section of these tests.
         server.delete('/api/ratings/toastyblast/456')
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA3OTg5NjY3LCJleHAiOjE1MDgwNzYwNjd9.03pExyw3gDub9khGNcZZHZnPVXrh54-UTQIklemsusQ') //Auth token for toastyblast
+            .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect('Content-Length', '72') //Size of the message that will be given when you successfully removed the rating with the tt_number.
             .expect(200, done);
     });

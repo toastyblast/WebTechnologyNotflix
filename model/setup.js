@@ -146,6 +146,20 @@ router.post('/', function (req, res) {
             }
         });
 
+        var postSeven = new User({
+            last_name: 'Plier',
+            middle_name: 'Moo',
+            first_name: 'Markie',
+            username: 'markiplier',
+            passwords: 'apples'
+        });
+
+        postSeven.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
         /* CREATE THE RATINGS */
         var post7 = new Rating({
             tt_number: 123,

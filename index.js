@@ -18,6 +18,7 @@ mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 //Parse the body of HTTP request and transform it to JSON.
 app.use(bodyParser.json());
 
+//TODO - TEACHER: Read the "READ_ME_BEFORE_RUNNING_TESTS!" file before doing anything, please!
 app.use('/api/import/', setup);
 
 /* -=- AUTHENTICATION RELATED ROUTINGS -=- */

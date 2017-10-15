@@ -16,7 +16,7 @@ router.post('/', function (req, res) {
 
                 if (users[0].passwords === req.body.passwords) {
                     var token = jwt.sign({'username': req.body.username}, req.app.get('secretkey'), {
-                        expiresIn: 86400 //86400 seconds equals 24 hours.
+                        expiresIn: 2419200 //2419200 seconds equals 4 weeks.
                     });
 
                     res.status(201);
