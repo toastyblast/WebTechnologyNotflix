@@ -4,6 +4,8 @@ mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var Movie = require('../model/movies.js');
 var User = require('../model/user.js');
 var Rating = require('../model/ratings.js');
+var SetupMark = require('../model/setupMark.js');
+
 var router = express.Router();
 
 
@@ -30,7 +32,7 @@ router.post('/', function (req, res) {
         importData();
     });
     function checkIfDataIsImported(callback) {
-        Movie.find({title: 'dummymovie'}, function (err, movies) {
+        SetupMark.find({title: 'dummypost'}, function (err, movies) {
             if (err) {
                 res.status(500);
                 res.json({errorMessage: 'No list of movies could be found in the database.'});
@@ -45,13 +47,9 @@ router.post('/', function (req, res) {
     }
 
     function importData() {
-        var dummypost = new Movie({
+        var dummypost = new SetupMark({
             tt_number: 999999999,
-            title: 'dummymovie',
-            publication_date: "9999-12-12",
-            length_min: 99,
-            director: '9999999999999999',
-            description: '9999999999999999999999'
+            title: 'dummypost'
         });
 
         dummypost.save(function (err, result) {

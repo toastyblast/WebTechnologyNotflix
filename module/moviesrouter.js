@@ -12,7 +12,7 @@ router.get('/', function (req, res) {
     var jsonString = '{"Movies":[]}';
     var obj = JSON.parse(jsonString);
     var allmovies;
-    console.log(req.query.title);
+
     if (req.query.title !== undefined){
         Movie.find({}, function (err, movies) {
 
@@ -36,7 +36,12 @@ router.get('/', function (req, res) {
                     });
                 }
                 if (movies.length-1 === i) {
-                    res.json(obj);
+                    if (obj.Movies.length === 0){
+                        res.status(404);
+                        res.json("Sorry we could not find a movie that matches your search.")
+                    } else {
+                        res.json(obj);
+                    }
                 }
             })
         });
@@ -64,7 +69,12 @@ router.get('/', function (req, res) {
                     });
                 }
                 if (movies.length-1 === i) {
-                    res.json(obj);
+                    if (obj.Movies.length === 0){
+                        res.status(404);
+                        res.json("Sorry we could not find a movie that matches your search.")
+                    } else {
+                        res.json(obj);
+                    }
                 }
             })
         });
@@ -91,11 +101,49 @@ router.get('/', function (req, res) {
                     });
                 }
                 if (movies.length-1 === i) {
-                    res.json(obj);
+                    if (obj.Movies.length === 0){
+                        res.status(404);
+                        res.json("Sorry we could not find a movie that matches your search.")
+                    } else {
+                        res.json(obj);
+                    }
                 }
             })
         });
-    } else {
+    } else if (req.query.ttnumber !== undefined){
+        Movie.find({}, function (err, movies) {
+
+            if (err) {
+                res.status(500);
+                res.json({errorMessage: 'No list of movies could be found in the database.'});
+                return console.error(err);
+            }
+
+            movies.forEach(function(movie, i){
+                var title = movie.tt_number;
+                console.log(title);
+                if (title === parseInt(req.query.ttnumber)) {
+                    obj["Movies"].push({
+                        tt_number : movie.tt_number,
+                        title : movie.title,
+                        date : movie.publication_date,
+                        length : movie.length,
+                        director : movie.director,
+                        description : movie.description
+                    });
+                    console.log(obj);
+                }
+                if (movies.length-1 === i) {
+                    if (obj.Movies.length === 0){
+                        res.status(404);
+                        res.json("Sorry we could not find a movie that matches your search.")
+                    } else {
+                        res.json(obj);
+                    }
+                }
+            })
+        });
+    }  else {
         Movie.find({}, function (err, movies) {
 
             if (err) {
@@ -108,9 +156,6 @@ router.get('/', function (req, res) {
             res.json(movies);
         })
     }
-
-
-
 });
 
 
