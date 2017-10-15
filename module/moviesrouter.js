@@ -62,11 +62,11 @@ router.get('/', function (req, res) {
             }
 
             movies.forEach(function (movie, i) {
-                var title = movie.director;
-                console.log(title);
+                var director = movie.director;
+                console.log(director);
 
                 //Add the movie to the response string.
-                if (title.toLowerCase().indexOf(req.query.director.toLowerCase()) !== -1) {
+                if (director.toLowerCase().indexOf(req.query.director.toLowerCase()) !== -1) {
                     obj["Movies"].push({
                         tt_number: movie.tt_number,
                         title: movie.title,
@@ -100,11 +100,11 @@ router.get('/', function (req, res) {
             }
 
             movies.forEach(function (movie, i) {
-                var title = movie.description;
-                console.log(title);
+                var description = movie.description;
+                console.log(description);
 
                 //Add the movie to the response string.
-                if (title.toLowerCase().indexOf(req.query.description.toLowerCase()) !== -1) {
+                if (description.toLowerCase().indexOf(req.query.description.toLowerCase()) !== -1) {
                     obj["Movies"].push({
                         tt_number: movie.tt_number,
                         title: movie.title,
@@ -138,11 +138,11 @@ router.get('/', function (req, res) {
             }
 
             movies.forEach(function (movie, i) {
-                var title = movie.tt_number;
-                console.log(title);
+                var ttnumber = movie.tt_number;
+                console.log(ttnumber);
 
                 //Add the movie to the response string.
-                if (title === parseInt(req.query.ttnumber)) {
+                if (ttnumber === parseInt(req.query.ttnumber)) {
                     obj["Movies"].push({
                         tt_number: movie.tt_number,
                         title: movie.title,
