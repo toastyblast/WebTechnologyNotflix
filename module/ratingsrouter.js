@@ -1,9 +1,10 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
+
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var Movie = require('../model/movies.js');
 var Rating = require('../model/ratings.js');
-var jwt = require('jsonwebtoken');
 
 var router = express.Router();
 
@@ -24,7 +25,7 @@ router.get('/', function (req, res) {
             res.json({errorMessage: '500 SERVER-SIDE ERROR - No list of movies to get the average ratings of could be found.'});
         }
         // loop over the results
-        movies.forEach(function(movie, i) {
+        movies.forEach(function (movie, i) {
             // get the Rating for this Movie
             Rating.find({'tt_number': movie.tt_number}, function (err, movieRatings) {
                 if (err) {
@@ -55,7 +56,7 @@ router.get('/', function (req, res) {
                 }
 
                 // this is the last one, call done()
-                if (movies.length-1 === i) {
+                if (movies.length - 1 === i) {
                     done(obj);
                 }
             });
@@ -175,7 +176,7 @@ router.get('/:username/:tt_number', function (req, res) {
 
         if (tokenUsername === username) {
             //Check if the authorized user is the user they are requesting to see.
-            Rating.find({'username': username, 'tt_number': tt_number}, {'_id':0, '__v':0}, function (err, rating) {
+            Rating.find({'username': username, 'tt_number': tt_number}, {'_id': 0, '__v': 0}, function (err, rating) {
 
                 if (err) {
                     res.status(500);
@@ -284,9 +285,6 @@ router.use(function (req, res, next) {
 });
 
 router.post('/', function (req, res) {
-    //TODO - NOTE (NOT REALLY TODO, IGNORE): Maybe add a check if the movie with the tt_number also exists? Then again, this'll
-    // TODO... most likely be used through a web portal, where ratings can only be made on a movie's page. And for the page to be there, the movie has=s to exist.
-
     //Due to the middleware we already know that the given rating is valid (between 0.0 and 5.0 included and in increments of 0.5).
     var decoded = req.app.locals.decoded;
     var tokenUsername = decoded.username;

@@ -8,13 +8,14 @@ var router = express.Router();
 
 router.post('/', function (req, res) {
     if (req.body.username !== undefined && req.body.passwords !== undefined) {
-
+        //Check if the body has been defined right.
         User.find({'username': req.body.username}, function (err, users) {
             if (err) return console.error(err);
 
             if (users.length > 0) {
-
+                //Check if there are actually any users with this username.
                 if (users[0].passwords === req.body.passwords) {
+                    //Then check if this username and password combination is right.
                     var token = jwt.sign({'username': req.body.username}, req.app.get('secretkey'), {
                         expiresIn: 2419200 //2419200 seconds equals 4 weeks.
                     });

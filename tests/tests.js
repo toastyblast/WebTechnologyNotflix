@@ -3,7 +3,7 @@ const superTest = require('supertest');
 var express = require('express');
 var mongoose = require('mongoose');
 var User = require('../model/user.js');
-mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 var router = express.Router();
 
 var server = superTest.agent("http://localhost:3000");
@@ -20,7 +20,7 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given tt_number", function (done) {
         server.get("/api/movies/?ttnumber= 123") //Add existing movie number.
             .expect("Content-type", /json/)
-            .expect(200,{
+            .expect(200, {
                 "Movies": [
                     {
                         "tt_number": 123,
@@ -30,7 +30,7 @@ describe("Movies unit tests", function () {
                         "description": "Tapping into that nostalgia mine!"
                     }
                 ]
-            } ,done);
+            }, done);
     });
 //
     it("Should return a 404 NOT FOUND error due to non-existant tt_number", function (done) {
@@ -43,7 +43,7 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given title", function (done) {
         server.get("/api/movies/?title=le") //Add existing move title.
             .expect("Content-type", /json/)
-            .expect(200,{
+            .expect(200, {
                 "Movies": [
                     {
                         "tt_number": 123,
@@ -59,7 +59,7 @@ describe("Movies unit tests", function () {
     it("Should return a 404 NOT FOUND as the movie with the given title does not exist", function (done) {
         server.get("/api/movies/?title=MovieTitleThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
     });
 //
     /* -=- All tests for the GET /api/movies/:director routing -=- */
@@ -76,13 +76,13 @@ describe("Movies unit tests", function () {
                         "description": "Nobody wants to see this anymore, oh god let it stop."
                     }
                 ]
-            },done);
+            }, done);
     });
 //
     it("Should return a 404 NOT FOUND as the movie with the given director does not exist", function (done) {
         server.get("/api/movies/?director=DirectorThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
     });
 
     it("Should return a movie with the given description", function (done) {
@@ -98,13 +98,13 @@ describe("Movies unit tests", function () {
                         "description": "Nobody wants to see this anymore, oh god let it stop."
                     }
                 ]
-            },done);
+            }, done);
     });
 
     it("Should return a 404 NOT FOUND as the movie with the given description does not exist", function (done) {
         server.get("/api/movies/?description=DescriptionThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
     });
 
 });
@@ -114,9 +114,9 @@ describe("Users unit tests", function () {
     it("Should create a new user with the given data", function (done) {
         server.post("/api/users")
             .send(({
-                "lastname" : "Test User Last Name",
-                "middlename" : " ",
-                "firstname" :"Test User First Name",
+                "lastname": "Test User Last Name",
+                "middlename": " ",
+                "firstname": "Test User First Name",
                 "usern": "Test User Username", //Username must be unique
                 "password": "123456"
             }))
@@ -127,9 +127,9 @@ describe("Users unit tests", function () {
     it("Should return a 400 BAD REQUEST as there is a missing password", function (done) {
         server.post("/api/users")
             .send(({
-                "lastname" : "Test User Last Name",
-                "middlename" : " ",
-                "firstname" :"Test User First Name",
+                "lastname": "Test User Last Name",
+                "middlename": " ",
+                "firstname": "Test User First Name",
                 "usern": "UniqueName", //username must be unique
                 "password": ""
             }))
@@ -140,9 +140,9 @@ describe("Users unit tests", function () {
     it("Should return a 409 CONFLICT as there is already a user with the given username", function (done) {
         server.post("/api/users")
             .send(({
-                "lastname" : "Test User Last Name",
-                "middlename" : " ",
-                "firstname" :"Test User First Name",
+                "lastname": "Test User Last Name",
+                "middlename": " ",
+                "firstname": "Test User First Name",
                 "usern": "Test User Username", //Username must exist.
                 "password": "password"
             }))
@@ -157,7 +157,7 @@ describe("Users unit tests", function () {
             .expect("Content-type", /json/)
             .expect(403, done);
 
-        User.remove({ username: 'Test User Username' }, function (err) {
+        User.remove({username: 'Test User Username'}, function (err) {
             if (err) return handleError(err);
 
         });
@@ -165,7 +165,7 @@ describe("Users unit tests", function () {
 
     it("Should return all users in the system (without password)", function (done) {
         server.get("/api/users")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(200, done);
         mongoose.connection.close();
@@ -180,7 +180,7 @@ describe("Users unit tests", function () {
 
     it("Should return a specific user (without password) with the given username", function (done) {
         server.get("/api/users/user/skellyton")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(200, [
                 {
@@ -191,39 +191,39 @@ describe("Users unit tests", function () {
                     "__v": 0,
                     "favourites": []
                 }
-            ],done);
+            ], done);
     });
 
     it("Should return a 404 NOT FOUND as the user with the given username could not be found", function (done) {
         server.get("/api/users/user/UniqueUser3")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 
     it("Should return a list with the amount of users that was specified", function (done) {
         server.get("/api/users/2")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(200, done);
     });
 
-    it("Should return 400 BAD REQUEST because the value that was passed was not a number",function (done) {
+    it("Should return 400 BAD REQUEST because the value that was passed was not a number", function (done) {
         server.get("/api/users/a")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(400, done);
     });
 
-    it("Should return 403 FORBIDDEN because the user is not allowed to look for users when not logged in.",function (done) {
+    it("Should return 403 FORBIDDEN because the user is not allowed to look for users when not logged in.", function (done) {
         server.get("/api/users/2")
             .expect("Content-type", /json/)
             .expect(403, done);
     });
 
-    it("Should add a movie to the favorites of the user",function (done) {
+    it("Should add a movie to the favorites of the user", function (done) {
         server.put("/api/users/favourites/The Lego Movie")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(function (res) {
                 res.body._id = '1';
@@ -242,23 +242,23 @@ describe("Users unit tests", function () {
             }, done);
     });
 
-    it("Should give ERROR 404 DOES NOT EXIST because you are trying to favorite a non-existing movie.",function (done) {
+    it("Should give ERROR 404 DOES NOT EXIST because you are trying to favorite a non-existing movie.", function (done) {
         server.put("/api/users/favourites/MovieThatDoesntExist")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 
     //Usually it is impossible to get a token with non existing username from our system. But for the sake of testing
     //this token was created with the jwt website.
-    it("Should give ERROR 404 DOES NOT EXIST because the token has a username which is not in the DB.",function (done) {
+    it("Should give ERROR 404 DOES NOT EXIST because the token has a username which is not in the DB.", function (done) {
         server.put("/api/users/favourites/MovieOne")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3NyIsImlhdCI6MTUwODA4NDkyNCwiZXhwIjoxNTEwNTA0MTI0fQ.rS1UooqWB615DNfoanO2xE5fa4Ck4Dvkv0wAURn8aSc"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3NyIsImlhdCI6MTUwODA4NDkyNCwiZXhwIjoxNTEwNTA0MTI0fQ.rS1UooqWB615DNfoanO2xE5fa4Ck4Dvkv0wAURn8aSc"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 
-    it("Should give ERROR 403 DOES NOT EXIST because the user cannot add favourites while not logged in.",function (done) {
+    it("Should give ERROR 403 DOES NOT EXIST because the user cannot add favourites while not logged in.", function (done) {
         server.put("/api/users/favourites/MovieOne")
             .expect("Content-type", /json/)
             .expect(403, done);
@@ -267,7 +267,7 @@ describe("Users unit tests", function () {
 
 describe("Authorization routing tests", function () {
     it("Should not generate a token if the request body is undefined or incorrect (400)", function (done) {
-        var credentials = {'userna':'toastyblast', 'pawords':'cheese'};
+        var credentials = {'userna': 'toastyblast', 'pawords': 'cheese'};
 
         server.post('/api/authenticate/')
             .send(credentials)
@@ -276,7 +276,7 @@ describe("Authorization routing tests", function () {
     });
 
     it("Should not generate a token if the username does not even exist (404)", function (done) {
-        var credentials = {'username':'toasty', 'passwords':'cheese'};
+        var credentials = {'username': 'toasty', 'passwords': 'cheese'};
 
         server.post('/api/authenticate/')
             .send(credentials)
@@ -285,7 +285,7 @@ describe("Authorization routing tests", function () {
     });
 
     it("Should not generate a token if the username + password combination is wrong (400)", function (done) {
-        var credentials = {'username':'toastyblast', 'passwords':'kaas'};
+        var credentials = {'username': 'toastyblast', 'passwords': 'kaas'};
 
         server.post('/api/authenticate/')
             .send(credentials)
@@ -294,7 +294,7 @@ describe("Authorization routing tests", function () {
     });
 
     it("Should generate a token if the username + password combination is correct (201)", function (done) {
-        var credentials = {'username':'toastyblast', 'passwords':'cheese'};
+        var credentials = {'username': 'toastyblast', 'passwords': 'cheese'};
 
         server.post('/api/authenticate/')
             .send(credentials)
@@ -315,7 +315,7 @@ describe("Ratings routings tests", function () {
                 res.body.theAverageRatings = [];
             })
             .expect(200, {
-                'theAverageRatings':[] //Check if the body actually has an averageRatingsArray. We do not care about the contents, as those can be different for everyone testing this REST service.
+                'theAverageRatings': [] //Check if the body actually has an averageRatingsArray. We do not care about the contents, as those can be different for everyone testing this REST service.
             }, done);
     });
 
@@ -328,9 +328,9 @@ describe("Ratings routings tests", function () {
                 // might've changed as the server is being used, so just give it some default value.
             })
             .expect(200, {
-                'confirmationMessage':'200 OK - Average rating for the sought movie has been retrieved.',
-                'tt_number':123, //We really only want to check if it retrieved the same movie, the rest doesn't matter.
-                'averageRating':3.5
+                'confirmationMessage': '200 OK - Average rating for the sought movie has been retrieved.',
+                'tt_number': 123, //We really only want to check if it retrieved the same movie, the rest doesn't matter.
+                'averageRating': 3.5
             }, done);
     });
 
@@ -402,17 +402,17 @@ describe("Ratings routings tests", function () {
                 // might've changed as the server is being used, so just give it some default value.
             })
             .expect(200, [{
-                'tt_number':123,
-                'username':'toastyblast',
-                'rating':3.5,
-                'date':'2017-01-01'
+                'tt_number': 123,
+                'username': 'toastyblast',
+                'rating': 3.5,
+                'date': '2017-01-01'
             }], done);
     });
 
     //ROUTING TESTS FOR POST /api/ratings/ AND THE MIDDLEWARE USED TO CHECK IF THE RATINGS ARE VALID
     it("Should not add rating as the items are identified wrong (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_numb':123, 'rate':4.5};
+        var ratingToAdd = {'tt_numb': 123, 'rate': 4.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -424,7 +424,7 @@ describe("Ratings routings tests", function () {
     //Middleware...
     it("Should not add rating as the rating is higher than 5.0 (or smaller than 0.0) (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number':123, 'rating':6.5};
+        var ratingToAdd = {'tt_number': 123, 'rating': 6.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -436,7 +436,7 @@ describe("Ratings routings tests", function () {
     //Middleware...
     it("Should not add rating as the rating is not in increments of X.0 or X.5 (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number':123, 'rating':3.3};
+        var ratingToAdd = {'tt_number': 123, 'rating': 3.3};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -447,7 +447,7 @@ describe("Ratings routings tests", function () {
 
     it("Should not add rating as the user already has a rating on this movie (409)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number':123, 'rating':4.0}; //Actual rating on tt_number 123 has a score of 4.5
+        var ratingToAdd = {'tt_number': 123, 'rating': 4.0}; //Actual rating on tt_number 123 has a score of 4.5
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -458,7 +458,7 @@ describe("Ratings routings tests", function () {
 
     it("Should add a new rating under this user's name (201)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number':456, 'rating':0.5};
+        var ratingToAdd = {'tt_number': 456, 'rating': 0.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -468,19 +468,19 @@ describe("Ratings routings tests", function () {
                 res.body.date = '2017-01-01'
             })
             .expect(201, {
-                '__v':0,
-                'tt_number':456,
-                'username':'toastyblast',
-                'rating':0.5,
-                '_id':'1',
-                'date':'2017-01-01'
+                '__v': 0,
+                'tt_number': 456,
+                'username': 'toastyblast',
+                'rating': 0.5,
+                '_id': '1',
+                'date': '2017-01-01'
             }, done);
     });
 
     /* -=- ROUTING TESTS FOR PUT /api/ratings/ -=- */
     it(("Should not update a rating that does not exist under this tt_number and/or username (404)"), function (done) {
         //Should be tt_number and rating.
-        var ratingToChange = {'tt_number':1234567890, 'rating':1.0};
+        var ratingToChange = {'tt_number': 1234567890, 'rating': 1.0};
 
         server.put('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -491,7 +491,7 @@ describe("Ratings routings tests", function () {
 
     it("Should change the rating for the specified movie under this user's name (200)", function (done) {
         //Should be tt_number and rating.
-        var ratingToChange = {'tt_number':456, 'rating':1.0};
+        var ratingToChange = {'tt_number': 456, 'rating': 1.0};
 
         server.put('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast

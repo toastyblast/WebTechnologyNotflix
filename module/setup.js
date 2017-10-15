@@ -9,7 +9,7 @@ var SetupMark = require('../model/setupMark.js');
 var router = express.Router();
 
 
-//TODO: List of what this setup file has to create to work with the tests (So only pre create what's listed here!):
+/* A summarized list of what dummy data this setup file creates: */
 // - A movie with tt_number:123, title:"The Lego Movie", publication_date:"2015-04-26", length_min:94, director:"Leg Godt", description:"Tapping into that nostalgia mine!"
 // - A movie with tt_number:456, title:"Die Hard 291", publication_date:"2101-08-02", length_min:97, director:"Michael Bay", description:"Nobody wants to see this anymore, oh god let it stop."
 // - A movie with tt_number:789, title:"The MegaBlox Movie", publication_date:"2016-11-19", length_min:91, director:"BootLeg Godt", description:"A bootleg movie about a bootleg construction block."
@@ -17,11 +17,13 @@ var router = express.Router();
 // - A user with last_name:'Slavov', middle_name:'Slavinov', first_name:'Martin', username:'sswxyz17', passwords:'peanuts'
 // - A user with last_name:'Kerbusch', middle_name:'', first_name:'Yoran', username:'toastyblast', passwords:'cheese'
 // - A user with last_name:'Deurie', middle_name:'Bonkie', first_name:'Martyni', username:'skellyton', passwords:'b0nk3rs'
+// - A user with last_name:'Plier', middle_name:'Moo', first_name:'Markie', username:'markiplier', passwords:'apples'
+//DO NOT ADD RATINGS FOR USER 'markiplier'!!! (Will break tests)
 
 // - A rating with tt_number:123, username:'toastyblast', rating: 4.5
 // - A rating with tt_number:123, username:'sswxyz17', rating: 4.0
 // - A rating with tt_number:123, username:'skellyton', rating: 3.0
-//DO NOT ADD RATINGS FOR tt_number:456!!!
+//DO NOT ADD RATINGS FOR tt_number:456!!! (Will break tests)
 // - A rating with tt_number:789, username:'skellyton', rating: 2.0
 // - A rating with tt_number:789, username:'toastyblast', rating: 0.0
 
@@ -31,6 +33,7 @@ router.post('/', function (req, res) {
     checkIfDataIsImported(function () {
         importData();
     });
+
     function checkIfDataIsImported(callback) {
         SetupMark.find({title: 'dummypost'}, function (err, movies) {
             if (err) {
@@ -40,7 +43,7 @@ router.post('/', function (req, res) {
             } else if (movies.length === 1) {
                 console.log(movies.length);
                 res.json('Data was already imported.');
-            } else if (movies.length === 0){
+            } else if (movies.length === 0) {
                 callback();
             }
         });
@@ -223,7 +226,6 @@ router.post('/', function (req, res) {
 
         res.json('Data has been imported');
     }
-
 
 
 });
