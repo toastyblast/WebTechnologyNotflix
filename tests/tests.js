@@ -352,6 +352,7 @@ describe("Ratings routings tests", function () {
             .expect(403, done);
     });
 
+    /* -=- All tests for the GET /api/ratings/:username/:tt_number routing -=- */
     it("Should not show a specific movie's rating from a different user than the one logged in (403)", function (done) {
         server.get("/api/ratings/sswxyz17/123") //Different user than the token holder.
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -453,7 +454,7 @@ describe("Ratings routings tests", function () {
             }, done);
     });
 
-    //ROUTING TESTS FOR PUT /api/ratings/
+    /* -=- ROUTING TESTS FOR PUT /api/ratings/ -=- */
     it(("Should not update a rating that does not exist under this tt_number and/or username (404)"), function (done) {
         //Should be tt_number and rating.
         var ratingToChange = {'tt_number':1234567890, 'rating':1.0};
