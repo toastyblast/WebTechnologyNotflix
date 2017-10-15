@@ -1,5 +1,12 @@
 const superTest = require('supertest');
 
+var express = require('express');
+var mongoose = require('mongoose');
+var User = require('../model/user.js');
+mongoose.connect('mongodb://localhost/Notflix', {useMongoClient:true});
+var router = express.Router();
+
+
 var server = superTest.agent("http://localhost:3000");
 
 describe("Movies unit tests", function () {
@@ -15,46 +22,74 @@ describe("Movies unit tests", function () {
 //
     /* -=- All tests for the GET /api/movies/:tt_number routing -=- */
     it("Should return a movie with the given tt_number", function (done) {
-        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/2 (or any other number)?
-        server.get("/api/movies/123") //Add existing movie number.
+        server.get("/api/movies/?ttnumber= 123") //Add existing movie number.
             .expect("Content-type", /json/)
-            .expect(200, done);
+            .expect(200,{
+                "Movies": [
+                    {
+                        "tt_number": 123,
+                        "title": "The Lego Movie",
+                        "date": "2015-04-26T00:00:00.000Z",
+                        "director": "Leg Godt",
+                        "description": "Tapping into that nostalgia mine!"
+                    }
+                ]
+            } ,done);
     });
 //
     it("Should return a 404 NOT FOUND error due to non-existant tt_number", function (done) {
-        //TODO: Does it need to be /api/movies/:tt_number or /api/movies/99999 (or any other number)?
-        server.get("/api/movies/NonExistentTtNumber")
+        server.get("/api/movies/?ttnumber=1234")
             .expect("Content-type", /json/)
-            .expect(404, done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
     });
 //
     /* -=- All tests for the GET /api/movies/:title routing -=- */
     it("Should return a movie with the given title", function (done) {
-        server.get("/api/movies/The Lego Movie") //Add existing move title.
+        server.get("/api/movies/?title=le") //Add existing move title.
             .expect("Content-type", /json/)
-            .expect(200, done);
+            .expect(200,{
+                "Movies": [
+                    {
+                        "tt_number": 123,
+                        "title": "The Lego Movie",
+                        "date": "2015-04-26T00:00:00.000Z",
+                        "director": "Leg Godt",
+                        "description": "Tapping into that nostalgia mine!"
+                    }
+                ]
+            }, done);
     });
 //
     it("Should return a 404 NOT FOUND as the movie with the given title does not exist", function (done) {
-        server.get("/api/movies/MovieTitleThatDoesntExist")
+        server.get("/api/movies/?title=MovieTitleThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
     });
 //
     /* -=- All tests for the GET /api/movies/:director routing -=- */
     it("Should return a movie with the given director", function (done) {
-        server.get("/api/movies/BootLeg Godt") //Add existing director.
+        server.get("/api/movies/?director=mi") //Add existing director.
             .expect("Content-type", /json/)
-            .expect(200, done);
+            .expect(200, {
+                "Movies": [
+                    {
+                        "tt_number": 456,
+                        "title": "Die Hard 291",
+                        "date": "2101-08-02T00:00:00.000Z",
+                        "director": "Michael Bay",
+                        "description": "Nobody wants to see this anymore, oh god let it stop."
+                    }
+                ]
+            },done);
     });
 //
     it("Should return a 404 NOT FOUND as the movie with the given director does not exist", function (done) {
-        server.get("/api/movies/DirectorThatDoesntExist")
+        server.get("/api/movies/?director=DirectorThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, done);
+            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
     });
 });
-//
+
 describe("Users unit tests", function () {
     //TODO: All tests with server.command("/api/users/???"). Does it need to be /api/users/:username or /api/movies/slavinski (or any other username)?
 
@@ -99,6 +134,7 @@ describe("Users unit tests", function () {
             }))
             .expect("Content-type", /json/)
             .expect(409, done);
+
     });
 
     /* -=- All tests for the GET /api/users routing -=- */
@@ -106,6 +142,11 @@ describe("Users unit tests", function () {
         server.get("/api/users")
             .expect("Content-type", /json/)
             .expect(403, done);
+
+        User.remove({ username: 'Test User Username' }, function (err) {
+            if (err) return handleError(err);
+
+        });
     });
 
     it("Should return all users in the system (without password)", function (done) {
@@ -114,6 +155,7 @@ describe("Users unit tests", function () {
             .expect("Content-type", /json/)
             //TODO: Check that each user's password is not in the response
             .expect(200, done);
+        mongoose.connection.close();
     });
 
     /* -=- All tests for the GET /api/users/:username routing -=- */
@@ -150,19 +192,8 @@ describe("Users unit tests", function () {
         server.get("/api/users/2")
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.WWdmqQHHRhod-xZP1gwSD-hnHBhy80v1OVry6oEB7jk"})
             .expect("Content-type", /json/)
-            .expect(200,
-                [
-                    {
-                        "last_name": "Slavov",
-                        "first_name": "Martin",
-                        "username": "sswxyz17"
-                    },
-                    {
-                        "last_name": "Kerbusch",
-                        "first_name": "Yoran",
-                        "username": "toastyblast"
-                    }
-                ]
+            .expect(200
+
                 ,done);
     });
 
@@ -212,6 +243,12 @@ describe("Users unit tests", function () {
             .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVuaXF1ZU5hbSIsImlhdCI6MTUwNzk5NDA5OSwiZXhwIjoxNTA4MDgwNDk5fQ.hd4TXqY0zaIpr4J71v4uNMeNgZ1AckcGY8K4gMWFdDQ"})
             .expect("Content-type", /json/)
             .expect(404, done);
+    })
+
+    it("Should give ERROR 403 DOES NOT EXIST because the user cannot add favourites while not logged in.",function (done) {
+        server.put("/api/users/favourites/MovieOne")
+            .expect("Content-type", /json/)
+            .expect(403, done);
     })
 
 });
