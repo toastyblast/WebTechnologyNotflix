@@ -279,6 +279,7 @@ describe("Authorization routing tests", function () {
 });
 
 var correctAuthenticationCode = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA4MDc4NjEzLCJleHAiOjE1MTA0OTc4MTN9.aHsJeREumlkykoOtEhckC7DIZndVtRdVi6gnA6KOrZI'; //Auth token for toastyblast
+//THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
 
 describe("Ratings routings tests", function () {
     /* -=- All tests for the GET /api/ratings/ routing -=- */
@@ -319,6 +320,7 @@ describe("Ratings routings tests", function () {
     it("Should not show the ratings of a different user than the one logged in (400)", function (done) {
         server.get("/api/ratings/toastyblast")
             .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDc5MTgwLCJleHAiOjE1MTA0OTgzODB9.NpJmhsbbMshdyp4i-G1UX4zlHxqAyM0Kz7qnB5xdh-4') //This is the auth token of sswxyz17, not toastyblast
+            //THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
             .expect("Content-type", /json/)
             .expect("Content-Length", "104") //Exact length of the error message given when the token is wrong.
             .expect(400, done);
@@ -335,6 +337,7 @@ describe("Ratings routings tests", function () {
     it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
         server.get("/api/ratings/markiplier") //This user should have no ratings yet
             .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtpcGxpZXIiLCJpYXQiOjE1MDgwNzk0NzAsImV4cCI6MTUxMDQ5ODY3MH0.P3ZC1Xsh3Mh26m08pBVKa0UdPcx9ytSJ-AvQfj_jExk') //Auth token for markiplier
+            //THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
             .expect("Content-type", /json/)
             .expect('Content-Length', '72') //Length of the correct code.
             .expect(404, done);
