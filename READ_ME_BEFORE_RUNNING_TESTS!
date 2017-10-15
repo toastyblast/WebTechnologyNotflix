@@ -3,13 +3,19 @@ BEFORE DOING ANYTHING WITH THIS RESTFUL SERVICE ON A NEW DEVICE, PLEASE READ!
 !!!
 
 Our RESTful service includes a setup.js file that is essential for the tests that we made in Mocha/Supertest.
-Once you’ve set up the database, run the index.js and before doing anything else, open a program like Postman.
+Once you’ve set up the database and have it online, run the index.js and before doing anything else, open a
+program like Postman.
 
-Using any service like Postman, type the following POST request: http://localhost:3000/api/import/
+Using Postman or any service like it, type the following POST request: http://localhost:3000/api/import/
 
-It is essential to run this routing first before running the test.js or trying out any of the other requests on Postman.
+It is essential to run this routing first before running the test.js or trying out any of the other operations of this
+RESTful service.
 
 The setup.js file will add some dummy data (movies, users and ratings) to your database. The tests rely on some of this
 data to be present, otherwise the majority will run into fails. We cannot be blamed for this, as we have to check
 something in our tests, and don’t know what you’ll add in the time, but we do know what data we intend to be present.
 So please run the request mentioned before, failing to do so will make it seem like our tests don’t work.
+
+International Bachelor-IT Y2Q1 Saxion 2017-2018
+Made by Web Technology Team 21 (EHI2VSp)
+Yoran Kerbusch & Martin S. Slavov
