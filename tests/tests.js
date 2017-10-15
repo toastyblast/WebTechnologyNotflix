@@ -84,6 +84,29 @@ describe("Movies unit tests", function () {
             .expect("Content-type", /json/)
             .expect(404, '"Sorry we could not find a movie that matches your search."',done);
     });
+
+    it("Should return a movie with the given description", function (done) {
+        server.get("/api/movies/?description=stop")
+            .expect("Content-type", /json/)
+            .expect(200, {
+                "Movies": [
+                    {
+                        "tt_number": 456,
+                        "title": "Die Hard 291",
+                        "date": "2101-08-02T00:00:00.000Z",
+                        "director": "Michael Bay",
+                        "description": "Nobody wants to see this anymore, oh god let it stop."
+                    }
+                ]
+            },done);
+    });
+
+    it("Should return a 404 NOT FOUND as the movie with the given description does not exist", function (done) {
+        server.get("/api/movies/?description=DescriptionThatDoesntExist")
+            .expect("Content-type", /json/)
+            .expect(404, '"Sorry we could not find a movie that matches your search."',done);
+    });
+
 });
 
 describe("Users unit tests", function () {
