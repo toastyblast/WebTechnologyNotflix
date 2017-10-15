@@ -13,7 +13,11 @@ router.get('/', function (req, res) {
     var obj = JSON.parse(jsonString);
     var allmovies;
 
+    //Check what the user is querying, and depending on query execute on of the if's.
+
     if (req.query.title !== undefined){
+        //If the user search for a movie by a title, check each movie's title if it contains the query word.
+        //If it does add it to the answer string and in the end print it.
         Movie.find({}, function (err, movies) {
 
             if (err) {
@@ -25,6 +29,7 @@ router.get('/', function (req, res) {
             movies.forEach(function(movie, i){
                 var title = movie.title;
                 console.log(movie);
+                //Add the movie to the response string.
                 if (title.toLowerCase().indexOf(req.query.title.toLowerCase()) !== -1) {
                     obj["Movies"].push({
                         tt_number : movie.tt_number,
@@ -46,7 +51,8 @@ router.get('/', function (req, res) {
             })
         });
     } else if (req.query.director !== undefined) {
-        console.log("hi");
+        //If the user search for a movie by a director, check each movie's director if it contains the query word.
+        //If it does add it to the answer string and in the end print it.
         Movie.find({}, function (err, movies) {
 
             if (err) {
@@ -58,6 +64,7 @@ router.get('/', function (req, res) {
             movies.forEach(function(movie, i){
                 var title = movie.director;
                 console.log(title);
+                //Add the movie to the response string.
                 if (title.toLowerCase().indexOf(req.query.director.toLowerCase()) !== -1) {
                     obj["Movies"].push({
                         tt_number : movie.tt_number,
@@ -79,6 +86,8 @@ router.get('/', function (req, res) {
             })
         });
     } else if (req.query.description !== undefined){
+        //If the user search for a movie by a description, check each movie's description if it contains the query word.
+        //If it does add it to the answer string and in the end print it.
         Movie.find({}, function (err, movies) {
 
             if (err) {
@@ -90,6 +99,7 @@ router.get('/', function (req, res) {
             movies.forEach(function(movie, i){
                 var title = movie.description;
                 console.log(title);
+                //Add the movie to the response string.
                 if (title.toLowerCase().indexOf(req.query.description.toLowerCase()) !== -1) {
                     obj["Movies"].push({
                         tt_number : movie.tt_number,
@@ -111,6 +121,8 @@ router.get('/', function (req, res) {
             })
         });
     } else if (req.query.ttnumber !== undefined){
+        //If the user search for a movie by a tt_number, check each movie's tt_number if it equals the query number.
+        //If it does add it to the answer string and in the end print it.
         Movie.find({}, function (err, movies) {
 
             if (err) {
@@ -122,6 +134,7 @@ router.get('/', function (req, res) {
             movies.forEach(function(movie, i){
                 var title = movie.tt_number;
                 console.log(title);
+                //Add the movie to the response string.
                 if (title === parseInt(req.query.ttnumber)) {
                     obj["Movies"].push({
                         tt_number : movie.tt_number,
@@ -145,7 +158,7 @@ router.get('/', function (req, res) {
         });
     }  else {
         Movie.find({}, function (err, movies) {
-
+            //If no query is specified display all movies.
             if (err) {
                 res.status(500);
                 res.json({errorMessage: 'No list of movies could be found in the database.'});

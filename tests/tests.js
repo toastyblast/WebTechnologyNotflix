@@ -245,6 +245,12 @@ describe("Users unit tests", function () {
             .expect(404, done);
     })
 
+    it("Should give ERROR 403 DOES NOT EXIST because the user cannot add favourites while not logged in.",function (done) {
+        server.put("/api/users/favourites/MovieOne")
+            .expect("Content-type", /json/)
+            .expect(403, done);
+    })
+
 });
 
 describe("Authorization routing tests", function () {

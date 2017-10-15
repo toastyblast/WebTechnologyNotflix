@@ -8,6 +8,8 @@ var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.post('/', function (req, res) {
+
+    //If the password is too short, don't allow the user to be registered.
     if (req.body.password.length < 4) {
         res.status(400);
         res.json({errorMessage : 'ERROR : INSUFFICIENT DATA. Password too short.'});
@@ -25,13 +27,13 @@ router.post('/', function (req, res) {
             if (err) {
 
                 if (err.errmsg !== undefined) {
-
+                    //If the username is already existing, send error.
                     if (err.errmsg.indexOf("duplicate") !== -1) {
                         res.status(409);
                         res.json({errorMessage: '409 CONFLICT - That username has already been taken'});
                     }
                 } else if (err.message !== undefined) {
-
+                    //If one of the data is empty, send error.
                     if (err.message.indexOf("required") !== -1) {
                         res.status(400);
                         res.json({
@@ -66,6 +68,7 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', function (req, res) {
+    //Show all the users without showing the id and password.
     User.find({}, {'_id': 0 , 'passwords': 0}, function (err, users) {
         if (err) {
             res.status(500);
@@ -78,6 +81,8 @@ router.get('/', function (req, res) {
 });
 
 router.get('/user/:usern', function (req, res) {
+    //Show a user that matches the username in the url.
+    //If the user is not found send 404 error.
     User.find({'username': req.params.usern}, {'_id':0, 'passwords':0}, function (err, users) {
         if (err) {
             res.status(500);
@@ -93,6 +98,7 @@ router.get('/user/:usern', function (req, res) {
 });
 
 router.get('/:limitresult', function (req, res) {
+    //Send the amount of users that was specified in the url.
     if (isNaN(req.params.limitresult)) {
         res.status(400);
         res.json('Please enter a number to specify how many users you want to see.');
@@ -114,7 +120,9 @@ router.put('/favourites/:movie', function (req, res) {
     console.log(tokenUsername);
     var userfound;
 
-    function three(callback) {
+    //Find the movie that the user is trying to favourite.
+    //If it doesn't exist send 404 error.
+    function findMovie(callback) {
         Movie.find({title: req.params.movie}, function (err, movies) {
             if (err) {
                 res.status(500);
@@ -129,7 +137,9 @@ router.put('/favourites/:movie', function (req, res) {
         });
     }
 
-    function one(callback) {
+    //Find the user that is sending the token.
+    //If the username that is received from the token is not in the DB, then send 404 error.
+    function findUser(callback) {
         User.find({'username': tokenUsername}, function (err, users) {
             if (err) {
                 res.status(500);
@@ -148,8 +158,9 @@ router.put('/favourites/:movie', function (req, res) {
     }
 
     //TODO: Maybe find a way to show the user that the movie, that he is trying to add is already in favourites.
-    function two(smth, callback) {
+    function addFavourite(smth, callback) {
         console.log(userfound);
+        //Add the movie to the user's favourite. A movie can only be added once, because we are using $addToSet.
         User.findByIdAndUpdate(userfound._id, { $addToSet: { favourites: req.params.movie}}, { new: true }, function (err, user) {
             if (err)
             {
@@ -160,9 +171,9 @@ router.put('/favourites/:movie', function (req, res) {
         });
     }
 
-    three(function () {
-        one(function () {
-            two(userfound, function () {
+    findMovie(function () {
+        findUser(function () {
+            addFavourite(userfound, function () {
 
             })
         });
