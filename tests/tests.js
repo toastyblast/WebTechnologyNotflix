@@ -226,9 +226,11 @@ describe("Users unit tests", function () {
             .expect(404, done);
     });
 
+    //Usually it is impossible to get a token with non existing username from our system. But for the sake of testing
+    //this token was created with the jwt website.
     it("Should give ERROR 404 DOES NOT EXIST because the token has a username which is not in the DB.",function (done) {
         server.put("/api/users/favourites/MovieOne")
-            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzIiwiaWF0IjoxNTA3OTk4MDkyLCJleHAiOjE1MDgwODQ0OTJ9.hMwdqqC_qvT43TUv59enZQfDYnNjsG9Uq8CLAlcVaCo"})
+            .set({"authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3NyIsImlhdCI6MTUwODA4NDkyNCwiZXhwIjoxNTEwNTA0MTI0fQ.rS1UooqWB615DNfoanO2xE5fa4Ck4Dvkv0wAURn8aSc"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
