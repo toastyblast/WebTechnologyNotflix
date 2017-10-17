@@ -10,6 +10,8 @@ var setup = require('./module/setup.js');
 
 var app = express();
 
+//Test change after repository renaming
+
 app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 
 //Start the Mongoose connection.
