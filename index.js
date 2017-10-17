@@ -10,8 +10,6 @@ var setup = require('./module/setup.js');
 
 var app = express();
 
-//Test change after repository renaming
-
 app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 
 //Start the Mongoose connection.
@@ -35,6 +33,9 @@ app.use('/api/users/', userRouter);
 
 /* -=- RATING RELATED ROUTINGS -=- */
 app.use('/api/ratings/', ratingRouter);
+
+/* -=- STATIC LOAD FOR WHEN THE ROUTINGS CAN'T BE FOUND -=- */
+app.use(express.static('public'));
 
 //Start the server at port 3000.
 app.listen(3000);
