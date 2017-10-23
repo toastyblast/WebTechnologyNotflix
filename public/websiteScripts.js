@@ -58,8 +58,8 @@ $(document).ready(function () {
                 console.log(response);
             }
         };
-        
 
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.send(data);
 
         event.preventDefault();
