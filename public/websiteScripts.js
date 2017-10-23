@@ -1,23 +1,9 @@
-$('#loginForm').submit(function (event) {
-    event.preventDefault();
-
-    var $form = $(this),
-        usernameGiven = $form.find("input[name='usernameBox']").val(),
-        passwordGiven = $form.find("input[name='passwordBox']").val();
-
-    var posting = $.post("http://localhost:3000/api/authentication/", {'username':usernameGiven, 'passwords':passwordGiven});
-
-    posting.done(function (data) {
-        console.log(data.errorMessage);
-        console.log(data.token);
-        var content = $(data).find("#content");
-        console.log(content.errorMessage);
-        console.log(content.token);
-        $("#loginForm").empty().append(content);
-    });
-});
-
 $(document).ready(function () {
+    $("#home").click(function () {
+        $("#result").empty();
+        $(".jumbotron").show();
+        $(".container").show();
+    });
 
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
@@ -46,15 +32,40 @@ $(document).ready(function () {
                 }
             }
         };
+
         xhttp.open("GET", "http://localhost:3000/api/movies/", true);
         xhttp.send();
     });
 
-    $("#home").click(function () {
-        $("#result").empty();
-        $(".jumbotron").show();
-        $(".container").show();
+    $("#registrationForm").submit(function (event) {
+        var usernameGiven = $("input[name='usernameRegistration']", this).val();
+        var passwordGiven = $("input[name='passwordRegistration']", this).val();
+
+        var data = JSON.stringify({username:usernameGiven, passwords:passwordGiven});
+        console.log(data);
+
+        // $.post("http://localhost:63342/api/users/", data, function () {
+        //     alert(data);
+        // }, "json");
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://localhost:3000/api/users/", true);
+
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var response = JSON.parse(this.responseText);
+
+                console.log(response);
+            }
+        };
+        
+
+        xhttp.send(data);
+
+        event.preventDefault();
     })
+
+    //Document calls here...
 });
 
 function formFunction() {
@@ -62,11 +73,14 @@ function formFunction() {
     var searchCategory = $("#exampleFormControlSelect1").val();
     // window.alert(searchCategory);
     $("#movieRow").empty();
+
     var xhttp = new XMLHttpRequest();
+
     xhttp.onreadystatechange = function() {
+
         if (this.readyState === 4 && this.status === 200) {
-            var response = 0;
-            response = JSON.parse(this.responseText);
+            var response = JSON.parse(this.responseText);
+
             for (var i = 0 ; i < response.Movies.length ; i++){
                 var newIn = "<div class=\"col-md-4\">\n" +
                     "            <div class=\"card\" style=\"width: 20rem;\">\n" +
@@ -83,6 +97,7 @@ function formFunction() {
             }
         }
     };
+
     if(searchCategory === "Title"){
         xhttp.open("GET", "http://localhost:3000/api/movies/?title="+ searchQuery, true);
         // xhttp.send();
@@ -96,7 +111,10 @@ function formFunction() {
         xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber="+ searchQuery, true);
         // xhttp.send();
     }
+
     xhttp.send();
+
     return false;
 }
-//...
+
+//Other functions here...

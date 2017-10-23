@@ -52,8 +52,8 @@
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0" id="loginForm">
-            <input class="form-control mr-sm-2" name="usernameBox" type="text" placeholder="Username" aria-label="Username">
-            <input class="form-control mr-sm-2" name="passwordBox" type="password" placeholder="Password" aria-label="Password">
+            <input class="form-control mr-sm-2" name="username" type="text" placeholder="Username" aria-label="Username">
+            <input class="form-control mr-sm-2" name="passwords" type="password" placeholder="Password" aria-label="Password">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
         </form>
     </div>
@@ -70,12 +70,14 @@
             and we of course have the rights to all movies and shows presented in our catalog! Now stop asking and enjoy
             the free content by registering now!</p>
         <p>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
-            <input class="form-control mr-sm-2" type="text" placeholder="Password" aria-label="PasswordRegister">
+        <form class="form-inline my-2 my-lg-0" id="registrationForm">
+        <input class="form-control mr-sm-2" type="text" placeholder="First name" name="firstRegistration" aria-label="firstNameRegister">
+        <input class="form-control mr-sm-2" type="text" placeholder="Last name" name="lastRegistration" aria-label="lastNameRegister">
+            <input class="form-control mr-sm-2" type="text" placeholder="Unique username" name="usernameRegistration" aria-label="UsernameRegister">
+            <input class="form-control mr-sm-2" type="text" placeholder="Password" name="passwordRegistration" aria-label="PasswordRegister">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Register</button>
+            <a id="informationText"></a>
         </form>
-        </p>
     </div>
 </div>
 

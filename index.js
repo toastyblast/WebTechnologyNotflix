@@ -15,6 +15,9 @@ app.set('secretkey', 'counsellorPalpatineDidNothingWrong');
 //Start the Mongoose connection.
 mongoose.connect('mongodb://localhost/Notflix', {useMongoClient: true});
 
+//Start the server at port 3000.
+app.listen(3000);
+
 //Parse the body of HTTP request and transform it to JSON.
 app.use(bodyParser.json());
 
@@ -36,6 +39,3 @@ app.use('/api/ratings/', ratingRouter);
 
 /* -=- STATIC LOAD FOR WHEN THE ROUTINGS CAN'T BE FOUND -=- */
 app.use(express.static('public'));
-
-//Start the server at port 3000.
-app.listen(3000);

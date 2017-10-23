@@ -8,6 +8,7 @@ var jwt = require('jsonwebtoken');
 var router = express.Router();
 
 router.post('/', function (req, res) {
+    console.log(req.body.password);
 
     //If the password is too short, don't allow the user to be registered.
     if (req.body.password.length < 4) {
