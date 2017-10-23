@@ -1,0 +1,37 @@
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-3">Notflix Movie Catalog</h1>
+        <p>Welcome to our catalog. Feel free to look through our large movie collection. If you cannot find what you
+            are searching for, do not worry! Just type the name, director or the description of the movie and we will
+            find
+            it for you.</p>
+        <p>
+        <form name="searchForm" class="form-inline my-2 my-lg-0" onsubmit="return formFunction()">
+            <input name="searchQuery" class="form-control mr-sm-2" type="text" placeholder="Title, director..."
+                   aria-label="PasswordRegister">
+            <div id="searchCategory" class="form-group">
+                <select class="form-control" id="exampleFormControlSelect1">
+                    <option>Title</option>
+                    <option>Director</option>
+                    <option>tt_number</option>
+                    <option>Description</option>
+                </select>
+            </div>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+
+        </form>
+
+        </p>
+    </div>
+
+</div>
+
+<div class="container">
+    <!-- Example row of columns -->
+    <div id="movieRow" class="row">
+
+    </div>
+
+    <hr>
+</div> <!-- /container -->

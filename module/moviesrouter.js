@@ -45,6 +45,9 @@ router.get('/', function (req, res) {
                         res.status(404);
                         res.json("Sorry we could not find a movie that matches your search.")
                     } else {
+                        res.status(200);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json(obj);
                     }
                 }
@@ -83,6 +86,9 @@ router.get('/', function (req, res) {
                         res.status(404);
                         res.json("Sorry we could not find a movie that matches your search.")
                     } else {
+                        res.status(200);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json(obj);
                     }
                 }
@@ -121,6 +127,9 @@ router.get('/', function (req, res) {
                         res.status(404);
                         res.json("Sorry we could not find a movie that matches your search.")
                     } else {
+                        res.status(200);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json(obj);
                     }
                 }
@@ -160,6 +169,9 @@ router.get('/', function (req, res) {
                         res.status(404);
                         res.json("Sorry we could not find a movie that matches your search.")
                     } else {
+                        res.status(200);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json(obj);
                     }
                 }
@@ -174,6 +186,9 @@ router.get('/', function (req, res) {
                 return console.error(err);
             }
 
+            res.status(200);
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             res.status(200);
             res.json(movies);
         })
