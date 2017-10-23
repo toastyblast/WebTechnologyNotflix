@@ -30,12 +30,16 @@ router.post('/', function (req, res) {
                     //If the username is already existing, send error.
                     if (err.errmsg.indexOf("duplicate") !== -1) {
                         res.status(409);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json({errorMessage: '409 CONFLICT - That username has already been taken'});
                     }
                 } else if (err.message !== undefined) {
                     //If one of the data is empty, send error.
                     if (err.message.indexOf("required") !== -1) {
                         res.status(400);
+                        res.header("Access-Control-Allow-Origin", "*");
+                        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                         res.json({
                             errorMessage: 'ERROR : INSUFFICIENT DATA : '
                             + err.message
@@ -44,6 +48,8 @@ router.post('/', function (req, res) {
                 }
             } else {
                 res.status(201);
+                res.header("Access-Control-Allow-Origin", "*");
+                res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                 res.json(result);
             }
         });
@@ -79,6 +85,8 @@ router.get('/', function (req, res) {
 
             return console.error(err);
         } else {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             res.json(users);
         }
     });

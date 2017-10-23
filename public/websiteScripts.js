@@ -54,7 +54,8 @@ $(document).ready(function () {
         $("#result").empty();
         $(".jumbotron").show();
         $(".container").show();
-    })
+    });
+
 });
 
 function formFunction() {
@@ -68,6 +69,7 @@ function formFunction() {
             var response = 0;
             response = JSON.parse(this.responseText);
             for (var i = 0 ; i < response.Movies.length ; i++){
+                // window.alert(JSON.stringify(response.Movies[0]));
                 var newIn = "<div class=\"col-md-4\">\n" +
                     "            <div class=\"card\" style=\"width: 20rem;\">\n" +
                     "                <!--<img class=\"card-img-top\" src=\"...\" alt=\"Card image cap\">-->\n" +
@@ -97,6 +99,58 @@ function formFunction() {
         // xhttp.send();
     }
     xhttp.send();
+    return false;
+}
+
+function registerFunction() {
+    var username = document.forms["registerForm"]["username"].value;
+    var password = document.forms["registerForm"]["password"].value;
+    localStorage.setItem('username', username);
+    localStorage.setItem('password', password);
+    var eyy = "<form id='nameForm' name=\"registerFormNames\" class=\"form-inline my-2 my-lg-0\" method=\"post\" onsubmit=\"return completeFunction()\">\n" +
+        "    <input name=\"firstname\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"First name\" aria-label=\"UsernameRegister\">\n" +
+        "    <input name=\"middlename\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"Middle name\" aria-label=\"PasswordRegister\">\n" +
+        "    <input name=\"lastname\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"Last name\" aria-label=\"PasswordRegister\">\n" +
+        "    <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Complete Registration</button>\n" +
+        "</form>";
+    $(".container").append(eyy);
+
+
+
+    return false;
+}
+
+function completeFunction() {
+    var firstname = document.forms["registerFormNames"]["firstname"].value;
+    var middlename = document.forms["registerFormNames"]["middlename"].value;
+    var lastname = document.forms["registerFormNames"]["lastname"].value;
+    var username = localStorage.getItem("username");
+    var password = localStorage.getItem("password");
+
+    var data = {
+        "lastname" : " " + lastname + " ",
+        "middlename" : " " + middlename + " ",
+        "firstname" : " " + firstname + " ",
+        "usern" : " " + username + " ",
+        "password" : " " + password + " "
+    };
+    // window.alert(data);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 201) {
+            // window.alert(JSON.parse(this.responseText));
+        } else {
+            // window.alert(this.responseText);
+        }
+        // window.alert(this.responseText);
+    };
+    xhttp.open("POST", 'http://localhost:3000/api/users/', true);
+    // xhttp.setRequestHeader("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4Nzc0NTk0LCJleHAiOjE1MTExOTM3OTR9.3QynZmUjP74Goaligk-FA9HAt50op3r6sy2pqtCyDvc");
+    // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(data));
+
+    $("#nameForm").remove();
     return false;
 }
 //...

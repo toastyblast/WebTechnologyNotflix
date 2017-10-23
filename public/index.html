@@ -70,9 +70,9 @@
             and we of course have the rights to all movies and shows presented in our catalog! Now stop asking and enjoy
             the free content by registering now!</p>
         <p>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
-            <input class="form-control mr-sm-2" type="text" placeholder="Password" aria-label="PasswordRegister">
+        <form id="form" name="registerForm" class="form-inline my-2 my-lg-0" method="post" onsubmit="return registerFunction()">
+            <input name="username" class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
+            <input name="password" class="form-control mr-sm-2" type="text" placeholder="Password" aria-label="PasswordRegister">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Register</button>
         </form>
         </p>
@@ -94,7 +94,7 @@
             <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
                 condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
                 euismod. Donec sed odio dui. </p>
-            <p><a class="btn btn-secondary" href="#" role="button">See the ratings! &raquo;</a></p>
+            <p><a class="btn btn-secondary" id="ratings" href="#" role="button">See the ratings! &raquo;</a></p>
         </div>
         <div class="col-md-4">
             <h2>Feed the hate for IMDB</h2>
