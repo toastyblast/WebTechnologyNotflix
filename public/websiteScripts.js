@@ -1,22 +1,3 @@
-$('#loginForm').submit(function (event) {
-    event.preventDefault();
-
-    var $form = $(this),
-        usernameGiven = $form.find("input[name='usernameBox']").val(),
-        passwordGiven = $form.find("input[name='passwordBox']").val();
-
-    var posting = $.post("http://localhost:3000/api/authentication/", {'username':usernameGiven, 'passwords':passwordGiven});
-
-    posting.done(function (data) {
-        console.log(data.errorMessage);
-        console.log(data.token);
-        var content = $(data).find("#content");
-        console.log(content.errorMessage);
-        console.log(content.token);
-        $("#loginForm").empty().append(content);
-    });
-});
-
 $(document).ready(function () {
 
     $("#catalogButton").click(function () {
@@ -25,12 +6,12 @@ $(document).ready(function () {
         $("#result").load("movies.html");
 
         var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
+        xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 var response = 0;
                 response = JSON.parse(this.responseText);
 
-                for (var i = 0 ; i < response.length ; i++){
+                for (var i = 0; i < response.length; i++) {
                     var newIn = "<div class=\"col-md-4\">\n" +
                         "            <div class=\"card\" style=\"width: 20rem;\">\n" +
                         "                <!--<img class=\"card-img-top\" src=\"...\" alt=\"Card image cap\">-->\n" +
@@ -56,6 +37,53 @@ $(document).ready(function () {
         $(".container").show();
     });
 
+    $('#loginForm').submit(function (event) {
+        //TODO - IDEA (No idea if possible) - CHECK IF THE USER HAS LOGGED IN SHORTLY BEFORE AND ALREADY DO MAKE THEM LOGGED IN.
+
+        event.preventDefault();
+
+        var username = document.forms["userLoginForm"]["usernameBox"].value;
+        var password = document.forms["userLoginForm"]["passwordBox"].value;
+
+        var data = {
+            "username": "" + username,
+            "passwords": "" + password
+        };
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            console.log(this.responseText);
+
+            if (this.readyState === 4 && this.status === 201) {
+                var response = JSON.parse(this.responseText);
+                var token = response.token;
+
+                // console.log(token);
+
+                localStorage.setItem('authorization', token);
+
+                $("#loginForm").replaceWith(
+                    "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
+                    "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + username + "</strong></a>" +
+                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
+                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
+                    "</div>");
+            } else {
+                var errorResponse = JSON.parse(this.responseText);
+                var errorMessage = errorResponse.errorMessage;
+
+                // console.log(errorMessage);
+
+                //TODO: Let the user know about the issue in some way.
+            }
+        };
+
+        xhttp.open("POST", 'http://localhost:3000/api/authenticate/', true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send(JSON.stringify(data));
+    });
+
+    //More action functions here...
 });
 
 function formFunction() {
@@ -65,11 +93,11 @@ function formFunction() {
     $("#movieRow").empty();
 
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             var response = 0;
             response = JSON.parse(this.responseText);
-            for (var i = 0 ; i < response.Movies.length ; i++){
+            for (var i = 0; i < response.Movies.length; i++) {
                 // window.alert(JSON.stringify(response.Movies[0]));
                 var newIn = "<div class=\"col-md-4\">\n" +
                     "            <div class=\"card\" style=\"width: 20rem;\">\n" +
@@ -86,17 +114,17 @@ function formFunction() {
             }
         }
     };
-    if(searchCategory === "Title"){
-        xhttp.open("GET", "http://localhost:3000/api/movies/?title="+ searchQuery, true);
+    if (searchCategory === "Title") {
+        xhttp.open("GET", "http://localhost:3000/api/movies/?title=" + searchQuery, true);
         // xhttp.send();
-    } else if (searchCategory === "Director"){
-        xhttp.open("GET", "http://localhost:3000/api/movies/?director="+ searchQuery, true);
+    } else if (searchCategory === "Director") {
+        xhttp.open("GET", "http://localhost:3000/api/movies/?director=" + searchQuery, true);
         // xhttp.send();
-    } else if (searchCategory === "Description"){
-        xhttp.open("GET", "http://localhost:3000/api/movies/?description="+ searchQuery, true);
+    } else if (searchCategory === "Description") {
+        xhttp.open("GET", "http://localhost:3000/api/movies/?description=" + searchQuery, true);
         // xhttp.send();
-    } else if (searchCategory === "tt_number"){
-        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber="+ searchQuery, true);
+    } else if (searchCategory === "tt_number") {
+        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + searchQuery, true);
         // xhttp.send();
     }
     xhttp.send();
@@ -130,16 +158,16 @@ function completeFunction() {
     var password = localStorage.getItem("password");
 
     var data = {
-        "lastname" : "" + lastname,
-        "middlename" : "" + middlename,
-        "firstname" : "" + firstname,
-        "usern" : "" + username,
-        "password" : "" + password
+        "lastname": "" + lastname,
+        "middlename": "" + middlename,
+        "firstname": "" + firstname,
+        "usern": "" + username,
+        "password": "" + password
     };
 
     // window.alert(data);
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
+    xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 201) {
             // window.alert(JSON.parse(this.responseText));
         } else {
@@ -155,7 +183,25 @@ function completeFunction() {
 
     $("#nameForm").remove();
     $("#registerButton").show();
-    
+
     return false;
 }
+
+function completeLogout() {
+    localStorage.removeItem("authorization");
+
+    //TODO - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
+
+    $("#loggedInDiv").replaceWith(
+        "<form class=\"form-inline my-2 my-lg-0\" id=\"loginForm\" name=\"userLoginForm\">" +
+        "   <input class=\"form-control mr-sm-2\" name=\"usernameBox\" type=\"text\" placeholder=\"Username\" aria-label=\"Username\">" +
+        "   <input class=\"form-control mr-sm-2\" name=\"passwordBox\" type=\"password\" placeholder=\"Password\" aria-label=\"Password\">" +
+        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Login</button>" +
+        "</form>");
+}
+
+function completeMyRatings() {
+    //TODO: Show a page with all of the user's ratings, and an option for them to search for specific ratings of theirs.
+}
+
 //...
