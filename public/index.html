@@ -52,8 +52,8 @@
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0" id="loginForm">
-            <input class="form-control mr-sm-2" name="username" type="text" placeholder="Username" aria-label="Username">
-            <input class="form-control mr-sm-2" name="passwords" type="password" placeholder="Password" aria-label="Password">
+            <input class="form-control mr-sm-2" name="usernameBox" type="text" placeholder="Username" aria-label="Username">
+            <input class="form-control mr-sm-2" name="passwordBox" type="password" placeholder="Password" aria-label="Password">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
         </form>
     </div>
@@ -70,14 +70,12 @@
             and we of course have the rights to all movies and shows presented in our catalog! Now stop asking and enjoy
             the free content by registering now!</p>
         <p>
-        <form class="form-inline my-2 my-lg-0" id="registrationForm">
-        <input class="form-control mr-sm-2" type="text" placeholder="First name" name="firstRegistration" aria-label="firstNameRegister">
-        <input class="form-control mr-sm-2" type="text" placeholder="Last name" name="lastRegistration" aria-label="lastNameRegister">
-            <input class="form-control mr-sm-2" type="text" placeholder="Unique username" name="usernameRegistration" aria-label="UsernameRegister">
-            <input class="form-control mr-sm-2" type="text" placeholder="Password" name="passwordRegistration" aria-label="PasswordRegister">
+        <form id="form" name="registerForm" class="form-inline my-2 my-lg-0" method="post" onsubmit="return registerFunction()">
+            <input name="username" class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
+            <input name="password" class="form-control mr-sm-2" type="text" placeholder="Password" aria-label="PasswordRegister">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Register</button>
-            <a id="informationText"></a>
         </form>
+        </p>
     </div>
 </div>
 
@@ -96,7 +94,7 @@
             <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
                 condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
                 euismod. Donec sed odio dui. </p>
-            <p><a class="btn btn-secondary" href="#" role="button">See the ratings! &raquo;</a></p>
+            <p><a class="btn btn-secondary" id="ratings" href="#" role="button">See the ratings! &raquo;</a></p>
         </div>
         <div class="col-md-4">
             <h2>Feed the hate for IMDB</h2>
