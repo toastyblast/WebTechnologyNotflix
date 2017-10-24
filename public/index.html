@@ -51,7 +51,7 @@
                 </div>
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0" id="loginForm">
+        <form class="form-inline my-2 my-lg-0" id="loginForm" name="userLoginForm">
             <input class="form-control mr-sm-2" name="usernameBox" type="text" placeholder="Username" aria-label="Username">
             <input class="form-control mr-sm-2" name="passwordBox" type="password" placeholder="Password" aria-label="Password">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
@@ -72,8 +72,8 @@
         <p>
         <form id="form" name="registerForm" class="form-inline my-2 my-lg-0" method="post" onsubmit="return registerFunction()">
             <input name="username" class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
-            <input name="password" class="form-control mr-sm-2" type="text" placeholder="Password" aria-label="PasswordRegister">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Register</button>
+            <input name="password" class="form-control mr-sm-2" type="password" placeholder="Password" aria-label="PasswordRegister">
+            <button class="btn btn-outline-success my-2 my-sm-0" id="registerButton" type="submit">Register</button>
         </form>
         </p>
     </div>
