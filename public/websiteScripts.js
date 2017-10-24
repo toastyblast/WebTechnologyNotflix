@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
@@ -12,9 +11,13 @@ $(document).ready(function () {
                 response = JSON.parse(this.responseText);
 
                 for (var i = 0; i < response.length; i++) {
+                    var number = response[i].imdb_tt_number;
+                    var title = response[i].title;
+                    getIMG(number, title);
+                    var url = localStorage.getItem(''+response[i].title+'');
                     var newIn = "<div class=\"col-md-4\">\n" +
                         "            <div class=\"card\" style=\"width: 20rem;\">\n" +
-                        "                <!--<img class=\"card-img-top\" src=\"...\" alt=\"Card image cap\">-->\n" +
+                        "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">\n" +
                         "                <div class=\"card-body\">\n" +
                         "                    <h4 class=\"card-title\">" + response[i].title + "</h4>\n" +
                         "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
@@ -98,11 +101,14 @@ function formFunction() {
             var response = 0;
             response = JSON.parse(this.responseText);
             for (var i = 0; i < response.Movies.length; i++) {
-                // window.alert(JSON.stringify(response.Movies[0]));
+                var number = response.Movies[i].imdb_tt_number;
+                var title = response.Movies[i].title;
+                getIMG(number, title);
+                var url = localStorage.getItem(''+response.Movies[i].title+'');
                 var newIn = "<div class=\"col-md-4\">\n" +
                     "            <div class=\"card\" style=\"width: 20rem;\">\n" +
-                    "                <!--<img class=\"card-img-top\" src=\"...\" alt=\"Card image cap\">-->\n" +
-                    "                <div class=\"card-body\">\n" +
+                    "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">" +
+                    "                <div class=\"card-body\">" +
                     "                    <h4 class=\"card-title\">" + response.Movies[i].title + "</h4>\n" +
                     "                    <h5 class=\"card-title\">" + response.Movies[i].director + "</h5>\n" +
                     "                    <p class=\"card-text\">" + response.Movies[i].description + "</p>\n" +
@@ -204,4 +210,18 @@ function completeMyRatings() {
     //TODO: Show a page with all of the user's ratings, and an option for them to search for specific ratings of theirs.
 }
 
+function getIMG(tt_number, title) {
+    var movie;
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            movie = JSON.parse(this.responseText);
+            var posterPath = movie.poster_path;
+            var ulrString = 'https://image.tmdb.org/t/p/w500' + posterPath;
+            localStorage.setItem(''+title+'', ulrString);
+        }
+    };
+    xhr.open("GET", "https://api.themoviedb.org/3/movie/"+tt_number+"?api_key=af1b95e9f890b9b6840cf6f08d0e6710&language=en-US", true);
+    xhr.send();
+}
 //...
