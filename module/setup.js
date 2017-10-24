@@ -5,7 +5,6 @@ var Movie = require('../model/movies.js');
 var User = require('../model/user.js');
 var Rating = require('../model/ratings.js');
 var SetupMark = require('../model/setupMark.js');
-
 var router = express.Router();
 
 
@@ -27,6 +26,32 @@ var router = express.Router();
 // - A rating with tt_number:789, username:'skellyton', rating: 2.0
 // - A rating with tt_number:789, username:'toastyblast', rating: 0.0
 
+
+// function getIMG(tt_number, director) {
+//     var movie;
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function() {
+//         if (this.readyState === 4 && this.status === 200) {
+//             movie = JSON.parse(this.responseText);
+//
+//             var post1 = new Movie({
+//                 tt_number: ''+tt_number+'',
+//                 title: ''+movie[0].title+'',
+//                 publication_date: ''+movie[0].release_date+'',
+//                 length_min: ''+movie[0].runtime+'',
+//                 director: ''+director+'',
+//                 description: ''+movie[0].overview+''
+//             });
+//             post1.save(function (err, result) {
+//                     if (err) {
+//                         return console.error(err);
+//                     }
+//                 });
+//         }
+//     };
+//     xhr.open("GET", "https://api.themoviedb.org/3/movie/"+tt_number+"?api_key=af1b95e9f890b9b6840cf6f08d0e6710&language=en-US", true);
+//     xhr.send();
+// }
 /* CREATE THE MOVIES */
 router.post('/', function (req, res) {
 
@@ -62,12 +87,14 @@ router.post('/', function (req, res) {
         });
 
         var post1 = new Movie({
+            imdb_tt_number : 'tt1490017',
             tt_number: 123,
             title: 'The Lego Movie',
-            publication_date: "2015-04-26",
+            publication_date: "2014-04-07",
             length_min: 94,
-            director: 'Leg Godt',
-            description: 'Tapping into that nostalgia mine!'
+            director: 'Christopher Miller',
+            description: 'An ordinary Lego construction worker, thought to be the prophesied \'Special\', is recruited ' +
+            'to join a quest to stop an evil tyrant from gluing the Lego universe into eternal stasis. '
         });
 
         post1.save(function (err, result) {
@@ -76,13 +103,17 @@ router.post('/', function (req, res) {
             }
         });
 
+        
         var post2 = new Movie({
+            imdb_tt_number : 'tt0095016',
             tt_number: 456,
-            title: "Die Hard 291",
-            publication_date: "2101-08-02",
+            title: "Die Hard",
+            publication_date: "1988-08-20",
             length_min: 97,
-            director: "Michael Bay",
-            description: "Nobody wants to see this anymore, oh god let it stop."
+            director: "John McTiernan",
+            description: "John McClane, officer of the NYPD, tries to save his wife Holly Gennaro and several others" +
+            " that were taken hostage by German terrorist Hans Gruber during a Christmas party at the Nakatomi Plaza " +
+            "in Los Angeles. "
         });
 
         post2.save(function (err, result) {
@@ -92,12 +123,15 @@ router.post('/', function (req, res) {
         });
 
         var postThree = new Movie({
+            imdb_tt_number : 'tt1663662',
             tt_number: 789,
-            title: "The MegaBlox Movie",
-            publication_date: "2016-11-19",
+            title: "Pacific Rim",
+            publication_date: "2013-11-12",
             length_min: 91,
-            director: "BootLeg Godt",
-            description: "A bootleg movie about a bootleg construction block."
+            director: "Guillermo del Toro  ",
+            description: "As a war between humankind and monstrous sea creatures wages on, a former pilot and a trainee" +
+            " are paired up to drive a seemingly obsolete special weapon in a desperate effort to save the world from " +
+            "the apocalypse. "
         });
 
         postThree.save(function (err, result) {
@@ -105,6 +139,10 @@ router.post('/', function (req, res) {
                 return console.error(err);
             }
         });
+
+        // getIMG('tt1490017', 'Christopher Miller');
+        // getIMG('tt0095016', 'John McTiernan');
+        // getIMG('tt1663662', 'Guillermo del Toro');
 
         /* CREATE THE USERS */
         var post4 = new User({

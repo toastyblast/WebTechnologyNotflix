@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var movieSchema = new Schema({
+    imdb_tt_number : {type:String, required: true},
     tt_number: {type: Number, required: true},
     title: {type: String, required: true},
     publication_date: {type: Date, required: true},
