@@ -63,6 +63,7 @@ function formFunction() {
     var searchCategory = $("#exampleFormControlSelect1").val();
     // window.alert(searchCategory);
     $("#movieRow").empty();
+
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
@@ -107,6 +108,9 @@ function registerFunction() {
     var password = document.forms["registerForm"]["password"].value;
     localStorage.setItem('username', username);
     localStorage.setItem('password', password);
+
+    $("#registerButton").hide();
+
     var eyy = "<form id='nameForm' name=\"registerFormNames\" class=\"form-inline my-2 my-lg-0\" method=\"post\" onsubmit=\"return completeFunction()\">\n" +
         "    <input name=\"firstname\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"First name\" aria-label=\"UsernameRegister\">\n" +
         "    <input name=\"middlename\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"Middle name\" aria-label=\"PasswordRegister\">\n" +
@@ -114,8 +118,6 @@ function registerFunction() {
         "    <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Complete Registration</button>\n" +
         "</form>";
     $(".container").append(eyy);
-
-
 
     return false;
 }
@@ -128,12 +130,13 @@ function completeFunction() {
     var password = localStorage.getItem("password");
 
     var data = {
-        "lastname" : " " + lastname + " ",
-        "middlename" : " " + middlename + " ",
-        "firstname" : " " + firstname + " ",
-        "usern" : " " + username + " ",
-        "password" : " " + password + " "
+        "lastname" : "" + lastname,
+        "middlename" : "" + middlename,
+        "firstname" : "" + firstname,
+        "usern" : "" + username,
+        "password" : "" + password
     };
+
     // window.alert(data);
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -151,6 +154,8 @@ function completeFunction() {
     xhttp.send(JSON.stringify(data));
 
     $("#nameForm").remove();
+    $("#registerButton").show();
+    
     return false;
 }
 //...
