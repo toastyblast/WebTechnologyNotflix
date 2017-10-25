@@ -30,45 +30,45 @@ if(localStorage.getItem("authorization") !== null) {
 }
 
 $(document).ready(function () {
+    getAllImages();
+
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
-        $("#result").load("movies.html");
+        $("#result").load("movies.html", function () {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    var response = JSON.parse(this.responseText);
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                var response = JSON.parse(this.responseText);
+                    for (var i = 0; i < response.length; i++) {
+                        var number = response[i].imdb_tt_number;
+                        var title = response[i].title;
 
-                for (var i = 0; i < response.length; i++) {
-                    var number = response[i].imdb_tt_number;
-                    var title = response[i].title;
+                        var url = localStorage.getItem('' + title + '');
 
-                    getIMG(number, title);
+                        var newIn = "<div class=\"col-md-4\">\n" +
+                            "            <div class=\"card\" style=\"width: 20rem;\">" +
+                            "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
+                            "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
+                            "                <div class=\"card-body\">\n" +
+                            "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
+                            "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
+                            "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
+                            "                </div>\n" +
+                            "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
+                            "            </div>\n" +
+                            "        </div>\n";
+                        $("#movieRow").append(newIn);
 
-                    var url = localStorage.getItem('' + title + '');
-
-                    var newIn = "<div class=\"col-md-4\">\n" +
-                        "            <div class=\"card\" style=\"width: 20rem;\">" +
-                        "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
-                        "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
-                        "                <div class=\"card-body\">\n" +
-                        "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
-                        "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
-                        "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
-                        "                </div>\n" +
-                        "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
-                        "            </div>\n" +
-                        "        </div>\n";
-                    $("#movieRow").append(newIn);
-
-                    buttonClick(i, title);
+                        buttonClick(i, title);
+                    }
+                    newFunction();
                 }
-                newFunction();
-            }
-        };
-        xhttp.open("GET", "http://localhost:3000/api/movies/", true);
-        xhttp.send();
+            };
+            xhttp.open("GET", "http://localhost:3000/api/movies/", true);
+            xhttp.send();
+        });
     });
 
     $("#home").click(function () {
@@ -268,36 +268,37 @@ function getUsers(search) {
     var colors = ["primary", "secondary", "success", "danger", "warning", "info", "dark"];
     $(".jumbotron").hide();
     $(".container").hide();
-    $("#result").load("users.html");
-    var token = localStorage.getItem('authorization');
+    $("#result").load("users.html", function () {
+        var token = localStorage.getItem('authorization');
 
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            var response = JSON.parse(this.responseText);
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var response = JSON.parse(this.responseText);
 
-            for (var i = 0 ; i < response.length ; i++){
-                var x = Math.floor((Math.random() * 7));
-                var newIn = " <div class=\"col-lg-4\">\n" +
-                    "                    <div class=\"card text-white bg-"+colors[x]+" mb-3\" style=\"max-width: 20rem;\">\n" +
-                    "                        <div class=\"card-header\">"+response[i].username+"</div>\n" +
-                    "                        <div class=\"card-body\">\n" +
-                    "                            <h4 class=\"card-title\">"+response[i].first_name+ ' ' +response[i].middle_name+ ' ' +response[i].last_name+"</h4>\n" +
-                    "                            <p class=\"card-text\">Favourites: "+response[i].favourites+"</p>\n" +
-                    "                        </div>\n" +
-                    "                    </div>\n" +
-                    "                </div>";
-                $("#usersGrid").append(newIn);
+                for (var i = 0 ; i < response.length ; i++){
+                    var x = Math.floor((Math.random() * 7));
+                    var newIn = " <div class=\"col-lg-4\">\n" +
+                        "                    <div class=\"card text-white bg-"+colors[x]+" mb-3\" style=\"max-width: 20rem;\">\n" +
+                        "                        <div class=\"card-header\">"+response[i].username+"</div>\n" +
+                        "                        <div class=\"card-body\">\n" +
+                        "                            <h4 class=\"card-title\">"+response[i].first_name+ ' ' +response[i].middle_name+ ' ' +response[i].last_name+"</h4>\n" +
+                        "                            <p class=\"card-text\">Favourites: "+response[i].favourites+"</p>\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                </div>";
+                    $("#usersGrid").append(newIn);
+                }
             }
+        };
+        if (search === undefined){
+            xhttp.open("GET", "http://localhost:3000/api/users/", true);
+        } else {
+            xhttp.open("GET", "http://localhost:3000/api/users/"+search, true);
         }
-    };
-    if (search === undefined){
-        xhttp.open("GET", "http://localhost:3000/api/users/", true);
-    } else {
-        xhttp.open("GET", "http://localhost:3000/api/users/"+search, true);
-    }
-    xhttp.setRequestHeader("authorization", token);
-    xhttp.send(token);
+        xhttp.setRequestHeader("authorization", token);
+        xhttp.send(token);
+    });
 }
 
 function buttonClick(i, title) {
@@ -343,5 +344,22 @@ function  newFunction() {
         xhttp.open("GET", "http://localhost:3000/api/movies/?pag="+($(this).text()), true);
         xhttp.send();
     })
+}
+
+function getAllImages() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            var response = JSON.parse(this.responseText);
+            for (var i = 0 ; i < response.length ; i++){
+                var number = response[i].imdb_tt_number;
+                var title = response[i].title;
+                getIMG(number, title);
+            }
+
+        }
+    };
+    xhttp.open("GET", "http://localhost:3000/api/movies/all", true);
+    xhttp.send();
 }
 //...
