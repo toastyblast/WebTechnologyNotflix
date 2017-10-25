@@ -1,0 +1,55 @@
+<div class="jumbotron">
+    <div class="row">
+        <div class="container col-md-7">
+            <h1 class="display-3">Your movie ratings</h1>
+            <p>You are your own critic, which we appreciate. Here you'll find all the ratings you ever made.
+                Additionally,if you've judged a lot of shows and movies, you can search for specific ones. Or more
+                importantly, through here, you can make new ratings, or delete old ones!
+                <br><br>
+                Please remember that only you will be able to see your specific rating. Other users (and you) will only
+                see average ratings when looking at movies. This choice has been made by us to protect users from witch
+                hunting and any other forms of threats. Your review will have an influence on the average rating, and
+                you can still show your friends your specific ratings once you access your account!
+            </p>
+            <p>
+            <form name="ratingSearchForm" class="form-inline my-2 my-lg-0" onsubmit="return ratingSearchFormFunction()">
+                <input name="ratingSearchQuery" class="form-control mr-sm-2 col-md-5" type="text"
+                       placeholder="IMDB TT number..."
+                       aria-label="RatingSearch">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            </p>
+        </div>
+        <div class="container col-md-5">
+            <h1 class="display-3">Rate even more!</h1>
+            <p>Let the rest of the world know what you thought about a particular movie!</p>
+            <p>
+            <form name="ratingCreationForm" method="post" onsubmit="return ratingCreateFormFunction()">
+                <div class="form-group">
+                    <label for="ratingMovieBox">Rated movie TT number:</label>
+                    <input id="ratingMovieBox" class="form-control mr-sm-2 col-md-5" type="text"
+                           placeholder="IMDB TT number..."
+                           aria-label="RatingMovieBox" required>
+                    <span class="help-block text-muted">If you're not sure what the TT number of the movie you want to rate is, take a look at our catalog!</span>
+                </div>
+                <div class="form-group">
+                    <label for="ratingScoreBox">Rating score:</label>
+                    <input id="ratingScoreBox" class="form-control mr-sm-2 col-md-3" type="number"
+                           placeholder="Score..."
+                           aria-label="RatingScoreBox" min="0.0" max="5.0" step="0.5" required>
+                    <span class="help-block text-muted">Scores must be between 0.0 and 5.0 inclusive and in increments of X.0 or X.5</span>
+                </div>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Post</button>
+            </form>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Example row of columns -->
+    <div id="ratingRow" class="row">
+
+    </div>
+    <hr>
+</div> <!-- /container -->

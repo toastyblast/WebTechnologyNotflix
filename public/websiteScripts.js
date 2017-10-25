@@ -10,17 +10,17 @@ if(localStorage.getItem("authorization") !== null) {
             if (this.status === 200) {
                 var response = JSON.parse(this.responseText);
                 var tokenUsername = response.tokenUsername;
+                localStorage.setItem("latestUserName", tokenUsername);
 
                 $("#loginForm").replaceWith(
                     "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
                     "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + tokenUsername + "</strong></a>" +
-                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
+                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings()\">My ratings</button>" +
                     "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
                     "</div>");
             } else {
                 localStorage.removeItem("authorization");
-
-                // completeLogout();
+                localStorage.removeItem("latestUserName");
             }
         }
     };
@@ -96,11 +96,12 @@ $(document).ready(function () {
                     var token = response.token;
 
                     localStorage.setItem('authorization', token);
+                    localStorage.setItem("latestUserName", username);
 
                     $("#loginForm").replaceWith(
                         "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
                         "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + username + "</strong></a>" +
-                        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
+                        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings()\">My ratings</button>" +
                         "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
                         "</div>");
                 } else {
@@ -232,6 +233,7 @@ function completeFunction() {
 
 function completeLogout() {
     localStorage.removeItem("authorization");
+    localStorage.removeItem("latestUserName");
 
     //TODO - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
 
@@ -239,7 +241,55 @@ function completeLogout() {
 }
 
 function completeMyRatings() {
-    //TODO: Show a page with all of the user's ratings, and an option for them to search for specific ratings of theirs.
+    //TODO: Show a page with all of the user's ratings, and an option for them to search for specific ratings of theirs or make a new rating.
+    $(".jumbotron").hide();
+    $(".container").hide();
+    $("#result").load("ratings.html");
+
+    var userToken = localStorage.getItem("authorization");
+    var userName = localStorage.getItem("latestUserName");
+    var url = "http://localhost:3000/api/ratings/" + userName;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200) {
+                var response = JSON.parse(this.responseText);
+
+                for (var i = 0; i < response.length; i++) {
+                    var number = response[i].tt_number;
+
+                    var newIn = "<div class=\"col-md-4\">\n" +
+                        "            <div class=\"card\" style=\"width: 20rem;\">" +
+                        "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i+1) + "</h4>\n" +
+                        "                <div class=\"card-body\">\n" +
+                        "                    <h5 class=\"card-title\">Movie TT number: " + number + "</h5>\n" +
+                        "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
+                        "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-primary\">Edit</a>\n" +
+                        "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-primary\">Remove</a>\n" +
+                        "                </div>\n" +
+                        "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
+                        "            </div>\n" +
+                        "        </div>\n";
+                    $("#ratingRow").append(newIn);
+
+                    //TODO:
+                    // changeButtonClick(i, number);
+                    // removeButtonClick(i, number);
+                }
+            } else {
+                var errorResponse = JSON.parse(this.responseText);
+                var errorMessage = errorResponse.errorMessage;
+
+                console.log(errorMessage)
+
+                //TODO: Error handling
+            }
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('authorization', userToken);
+    xhttp.send();
 }
 
 function getIMG(tt_number, title) {
