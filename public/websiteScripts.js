@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    //TODO - IDEA (No idea if possible) - Check if the user was logged in prior to this new session when they go to the index page. If so, already log them in.
+
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
@@ -7,26 +9,30 @@ $(document).ready(function () {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-                var response = 0;
-                response = JSON.parse(this.responseText);
+                var response = JSON.parse(this.responseText);
 
                 for (var i = 0; i < response.length; i++) {
                     var number = response[i].imdb_tt_number;
                     var title = response[i].title;
+
                     getIMG(number, title);
-                    var url = localStorage.getItem(''+response[i].title+'');
+
+                    var url = localStorage.getItem('' + title + '');
+
                     var newIn = "<div class=\"col-md-4\">\n" +
-                        "            <div class=\"card\" style=\"width: 20rem;\">\n" +
-                        "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">\n" +
+                        "            <div class=\"card\" style=\"width: 20rem;\">" +
+                        "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
+                        "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
                         "                <div class=\"card-body\">\n" +
-                        "                    <h4 id=\""+i+"ab\"class=\"card-title\">" + response[i].title + "</h4>\n" +
                         "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
                         "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
                         "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
                         "                </div>\n" +
+                        "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
                         "            </div>\n" +
-                        "        </div>";
+                        "        </div>\n";
                     $("#movieRow").append(newIn);
+
                     buttonClick(i, title);
                 }
             }
@@ -35,7 +41,6 @@ $(document).ready(function () {
         xhttp.send();
     });
 
-
     $("#home").click(function () {
         $("#result").empty();
         $(".jumbotron").show();
@@ -43,8 +48,6 @@ $(document).ready(function () {
     });
 
     $('#loginForm').submit(function (event) {
-        //TODO - IDEA (No idea if possible) - CHECK IF THE USER HAS LOGGED IN SHORTLY BEFORE AND ALREADY DO MAKE THEM LOGGED IN.
-
         event.preventDefault();
 
         var username = document.forms["userLoginForm"]["usernameBox"].value;
@@ -91,6 +94,7 @@ $(document).ready(function () {
     $('#users').click(function () {
         getUsers();
     });
+
     //More action functions here...
 });
 
