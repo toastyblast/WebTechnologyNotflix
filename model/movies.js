@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var mongoosePaginate = require('mongoose-paginate');
 var Schema = mongoose.Schema;
 
 var movieSchema = new Schema({
@@ -11,4 +12,5 @@ var movieSchema = new Schema({
     description: {type: String, required: true}
 });
 
+movieSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model('Movies', movieSchema);

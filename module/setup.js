@@ -140,6 +140,110 @@ router.post('/', function (req, res) {
             }
         });
 
+        var postFour = new Movie({
+            imdb_tt_number : 'tt2488496',
+            tt_number: 228,
+            title: "Star Wars: The Force Awakens ",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: " J.J. Abrams",
+            description: "Three decades after the Empire's defeat, a new threat arises in the militant First Order. " +
+            "Stormtrooper defector Finn and spare parts scavenger Rey are caught up in the Resistance's search " +
+            "for the missing Luke Skywalker. "
+        });
+
+        postFour.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
+        var postFive = new Movie({
+            imdb_tt_number : 'tt1386697',
+            tt_number: 227,
+            title: "Suicide Squad",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: " J.J. Abrams",
+            description: "A secret government agency recruits some of the most dangerous incarcerated super-villains to" +
+            " form a defensive task force. Their first mission: save the world from the apocalypse. "
+        });
+
+        postFive.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
+        var postSix = new Movie({
+            imdb_tt_number : 'tt1431045',
+            tt_number: 226,
+            title: "Deadpool",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: " Tim Miller ",
+            description: "A fast-talking mercenary with a morbid sense of humor is subjected to a rogue experiment that" +
+            " leaves him with accelerated healing powers and a quest for revenge. "
+        });
+
+        postSix.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
+        var postMovie7 = new Movie({
+            imdb_tt_number : 'tt0472181',
+            tt_number: 225,
+            title: "The Smurfs",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: " Raja Gosnell",
+            description: "When the evil wizard Gargamel chases the tiny blue Smurfs out of their village, " +
+            "they tumble from their magical world into New York City. "
+        });
+
+        postMovie7.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
+        var postMovie8 = new Movie({
+            imdb_tt_number : 'tt3498820',
+            tt_number: 224,
+            title: "Captain America: Civil War",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: "Anthony Russo",
+            description: "Political interference in the Avengers' activities causes a rift between " +
+            "former allies Captain America and Iron Man. "
+        });
+
+        postMovie8.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
+        var postMovie9 = new Movie({
+            imdb_tt_number : 'tt4649466',
+            tt_number: 223,
+            title: "Kingsman: The Golden Circle",
+            publication_date: "2013-11-12",
+            length_min: 91,
+            director: " Matthew Vaughn ",
+            description: "When their headquarters are destroyed and the world is held hostage, the Kingsman's journey " +
+            "leads them to the discovery of an allied spy organization in the US. These two elite secret " +
+            "organizations must band together to defeat a common enemy. "
+        });
+
+        postMovie9.save(function (err, result) {
+            if (err) {
+                return console.error(err);
+            }
+        });
+
         // getIMG('tt1490017', 'Christopher Miller');
         // getIMG('tt0095016', 'John McTiernan');
         // getIMG('tt1663662', 'Guillermo del Toro');

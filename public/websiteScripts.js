@@ -35,6 +35,7 @@ $(document).ready(function () {
 
                     buttonClick(i, title);
                 }
+                newFunction();
             }
         };
         xhttp.open("GET", "http://localhost:3000/api/movies/", true);
@@ -112,7 +113,7 @@ function formFunction() {
             for (var i = 0; i < response.Movies.length; i++) {
                 var number = response.Movies[i].imdb_tt_number;
                 var title = response.Movies[i].title;
-                getIMG(number, title);
+                // getIMG(number, title);
                 var url = localStorage.getItem(''+response.Movies[i].title+'');
                 var newIn = "<div class=\"col-md-4\">\n" +
                     "            <div class=\"card\" style=\"width: 20rem;\">\n" +
@@ -292,5 +293,34 @@ function buttonClick(i, title) {
         xhttp.setRequestHeader("authorization", token);
         xhttp.send();
     });
+}
+
+function  newFunction() {
+    $(".page-item").click(function () {
+        $("#movieRow").empty();
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                var response = JSON.parse(this.responseText);
+                for (var i = 0 ; i < response.length ; i++){
+                    var url = localStorage.getItem(''+response[i].title+'');
+                    var newIn = "<div class=\"col-md-4\">\n" +
+                        "            <div class=\"card\" style=\"width: 20rem;\">\n" +
+                        "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">" +
+                        "                <div class=\"card-body\">" +
+                        "                    <h4 class=\"card-title\">" + response[i].title + "</h4>\n" +
+                        "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
+                        "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
+                        "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
+                        "                </div>\n" +
+                        "            </div>\n" +
+                        "        </div>";
+                    $("#movieRow").append(newIn);
+                }
+            }
+        };
+        xhttp.open("GET", "http://localhost:3000/api/movies/?pag="+($(this).text()), true);
+        xhttp.send();
+    })
 }
 //...
