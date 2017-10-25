@@ -198,5 +198,20 @@ router.get('/', function (req, res) {
     }
 });
 
+router.get('/all', function (req, res) {
+    //Show all the users without showing the id and password.
+    Movie.find({}, {'_id': 0, 'passwords': 0}, function (err, movies) {
+        if (err) {
+            res.status(500);
+            res.json({errorMessage: 'No list of users could be found in the database.'});
+            return console.error(err);
+        } else {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.json(movies);
+        }
+    });
+});
+
 
 module.exports = router;
