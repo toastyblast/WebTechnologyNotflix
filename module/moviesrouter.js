@@ -177,21 +177,24 @@ router.get('/', function (req, res) {
                 }
             })
         });
-    } else {
-        Movie.find({}, function (err, movies) {
-            //If no query is specified display all movies.
-            if (err) {
-                res.status(500);
-                res.json({errorMessage: 'No list of movies could be found in the database.'});
-                return console.error(err);
-            }
+    } else if (req.query.pag !== undefined){
 
-            res.status(200);
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.status(200);
-            res.json(movies);
-        })
+            Movie.paginate({}, { offset: parseInt(req.query.pag)*3, limit: 3 }, function(err, result) {
+                // result.docs
+                // result.total
+                // result.limit - 10
+                // result.offset - 20
+                res.json(result.docs);
+            });
+
+    } else {
+        Movie.paginate({}, { offset: 0, limit: 3 }, function(err, result) {
+            // result.docs
+            // result.total
+            // result.limit - 10
+            // result.offset - 20
+            res.json(result.docs);
+        });
     }
 });
 
