@@ -38,4 +38,24 @@ router.post('/', function (req, res) {
     }
 });
 
+router.post('/check', function (req, res) {
+    var token = req.body.token;
+
+    jwt.verify(token, req.app.get("secretkey"), function (err, decoded) {
+        //Verify the token the user sent back to you.
+        if (err) {
+            res.status(403);
+            res.json({
+                errorMessage: '403 FORBIDDEN - This token has expired.'
+            });
+        } else {
+            res.status(200);
+            res.json({
+                tokenUsername: "" + decoded.username,
+                errorMessage: '200 OK - This token has not expired.'
+            });
+        }
+    });
+});
+
 module.exports = router;

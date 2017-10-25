@@ -1,6 +1,35 @@
-$(document).ready(function () {
-    //TODO - IDEA (No idea if possible) - Check if the user was logged in prior to this new session when they go to the index page. If so, already log them in.
+if(localStorage.getItem("authorization") !== null) {
+    //Check if the browser still has a valid token stored, if so, just log them into the user from that token.
+    var data = {
+        "token":localStorage.getItem("authorization")
+    };
 
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200) {
+                var response = JSON.parse(this.responseText);
+                var tokenUsername = response.tokenUsername;
+
+                $("#loginForm").replaceWith(
+                    "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
+                    "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + tokenUsername + "</strong></a>" +
+                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
+                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
+                    "</div>");
+            } else {
+                localStorage.removeItem("authorization");
+
+                // completeLogout();
+            }
+        }
+    };
+    xhttp.open("POST", "http://localhost:3000/api/authenticate/check", true);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(data));
+}
+
+$(document).ready(function () {
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
@@ -61,35 +90,32 @@ $(document).ready(function () {
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            console.log(this.responseText);
+            if (this.readyState === 4) {
+                if (this.status === 201) {
+                    var response = JSON.parse(this.responseText);
+                    var token = response.token;
 
-            if (this.readyState === 4 && this.status === 201) {
-                var response = JSON.parse(this.responseText);
-                var token = response.token;
+                    localStorage.setItem('authorization', token);
 
-                // console.log(token);
+                    $("#loginForm").replaceWith(
+                        "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
+                        "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + username + "</strong></a>" +
+                        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
+                        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
+                        "</div>");
+                } else {
+                    var errorResponse = JSON.parse(this.responseText);
+                    var errorMessage = errorResponse.errorMessage;
 
-                localStorage.setItem('authorization', token);
-
-                $("#loginForm").replaceWith(
-                    "<div id=\"loggedInDiv\" class=\"form-inline my-2 my-lg-0\">" +
-                    "   <a class=\"nav-link\" id=\"special-text\">Welcome back, <strong>" + username + "</strong></a>" +
-                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings\">My ratings</button>" +
-                    "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
-                    "</div>");
-            } else {
-                var errorResponse = JSON.parse(this.responseText);
-                var errorMessage = errorResponse.errorMessage;
-
-                // console.log(errorMessage);
-
-                //TODO: Let the user know about the issue in some way.
+                    //TODO: Let the user know about the issue in some way, like with error bubbles or something.
+                }
             }
         };
-
         xhttp.open("POST", 'http://localhost:3000/api/authenticate/', true);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.send(JSON.stringify(data));
+
+        return false;
     });
 
     $('#users').click(function () {
@@ -209,12 +235,7 @@ function completeLogout() {
 
     //TODO - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
 
-    $("#loggedInDiv").replaceWith(
-        "<form class=\"form-inline my-2 my-lg-0\" id=\"loginForm\" name=\"userLoginForm\">" +
-        "   <input class=\"form-control mr-sm-2\" name=\"usernameBox\" type=\"text\" placeholder=\"Username\" aria-label=\"Username\">" +
-        "   <input class=\"form-control mr-sm-2\" name=\"passwordBox\" type=\"password\" placeholder=\"Password\" aria-label=\"Password\">" +
-        "   <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Login</button>" +
-        "</form>");
+    location.reload();
 }
 
 function completeMyRatings() {
@@ -276,7 +297,7 @@ function getUsers(search) {
         xhttp.open("GET", "http://localhost:3000/api/users/"+search, true);
     }
     xhttp.setRequestHeader("authorization", token);
-    xhttp.send();
+    xhttp.send(token);
 }
 
 function buttonClick(i, title) {
