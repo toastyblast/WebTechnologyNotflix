@@ -250,29 +250,31 @@ function ratingSearchFormFunction() {
 function ratingCreateFormFunction() {
     var givenTTNumber = $("#ratingMovieBox").val();
     var givenScore = $("#ratingScoreBox").val();
+    var data = {};
 
     var userToken = localStorage.getItem("authorization");
 
     var xhttp = new XMLHttpRequest();
     var secondxhttp = new XMLHttpRequest();
 
+    //TODO: Make this work.
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             if (this.status === 200) {
                 //Find the movie with the given TT number, to gets its internal database TT number, as we need both that one and the official IMDB TT number to make a rating.
-                var firstResponse = JSON.parse(xhttp.responseText);
+                var firstResponse = JSON.parse(this.responseText);
 
                 var databaseTTNumber = firstResponse.tt_number;
 
-                var data = {
-                    "imdb_tt_number": givenTTNumber,
+                data = {
+                    "imdb_tt_number": "tt" + givenTTNumber,
                     "tt_number": databaseTTNumber,
                     "rating": givenScore
                 };
 
                 secondxhttp.onreadystatechange = function () {
-                    if (this.readyState === 4) {
-                        if (this.status === 201) {
+                    if (secondxhttp.readyState === 4) {
+                        if (secondxhttp.status === 201) {
                             //The rating has been created, so now reload the div with ratings and it should be there!
                             completeMyRatings();
                         } else {
@@ -285,11 +287,13 @@ function ratingCreateFormFunction() {
                     }
                 };
 
+                console.log(data);
+
                 secondxhttp.open("POST", "http://localhost:3000/api/ratings/", true);
                 secondxhttp.setRequestHeader('authorization', userToken);
                 secondxhttp.send(JSON.stringify(data));
             } else {
-                var firstErrorResponse = JSON.parse(xhttp.responseText);
+                var firstErrorResponse = JSON.parse(this.responseText);
                 var errorMessage = firstErrorResponse.errorMessage;
 
                 console.log(errorMessage)
@@ -297,8 +301,7 @@ function ratingCreateFormFunction() {
             }
         }
     };
-
-    xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + givenTTNumber + "&pag=0", true);
+    xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=tt" + givenTTNumber + "&pag=0", true);
     xhttp.send();
 
     return false;
