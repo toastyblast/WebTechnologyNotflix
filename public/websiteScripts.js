@@ -218,7 +218,7 @@ function ratingSearchFormFunction() {
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
+        if (this.readyState === 4) {
             if (this.status === 200) {
                 var response = JSON.parse(this.responseText);
 
@@ -234,12 +234,71 @@ function ratingSearchFormFunction() {
     };
 
     if (soughtTTNumber !== '') {
+        //If the user did fill in a rating, look for the given rating. The router will check if the given value complies with "tt<7 digits>"
         soughtTTNumber = "tt" + soughtTTNumber;
         xhttp.open("GET", url + "/" + soughtTTNumber, true);
     } else {
+        //If the user didn't fill in anything but still clicked the search button, just reload the page and show all the ratings they made.
         xhttp.open("GET", url, true);
     }
     xhttp.setRequestHeader('authorization', userToken);
+    xhttp.send();
+
+    return false;
+}
+
+function ratingCreateFormFunction() {
+    var givenTTNumber = $("#ratingMovieBox").val();
+    var givenScore = $("#ratingScoreBox").val();
+
+    var userToken = localStorage.getItem("authorization");
+
+    var xhttp = new XMLHttpRequest();
+    var secondxhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200) {
+                //Find the movie with the given TT number, to gets its internal database TT number, as we need both that one and the official IMDB TT number to make a rating.
+                var firstResponse = JSON.parse(xhttp.responseText);
+
+                var databaseTTNumber = firstResponse.tt_number;
+
+                var data = {
+                    "imdb_tt_number": givenTTNumber,
+                    "tt_number": databaseTTNumber,
+                    "rating": givenScore
+                };
+
+                secondxhttp.onreadystatechange = function () {
+                    if (this.readyState === 4) {
+                        if (this.status === 201) {
+                            //The rating has been created, so now reload the div with ratings and it should be there!
+                            completeMyRatings();
+                        } else {
+                            var errorResponse = JSON.parse(secondxhttp.responseText);
+                            var errorMessage = errorResponse.errorMessage;
+
+                            console.log(errorMessage)
+                            //TODO: Error handling
+                        }
+                    }
+                };
+
+                secondxhttp.open("POST", "http://localhost:3000/api/ratings/", true);
+                secondxhttp.setRequestHeader('authorization', userToken);
+                secondxhttp.send(JSON.stringify(data));
+            } else {
+                var firstErrorResponse = JSON.parse(xhttp.responseText);
+                var errorMessage = firstErrorResponse.errorMessage;
+
+                console.log(errorMessage)
+                //TODO: Error handling
+            }
+        }
+    };
+
+    xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + givenTTNumber + "&pag=0", true);
     xhttp.send();
 
     return false;
