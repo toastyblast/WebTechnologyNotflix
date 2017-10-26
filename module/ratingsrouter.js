@@ -169,14 +169,15 @@ router.get('/:username/:tt_number', function (req, res) {
     //The user has filled in both a username (must be theirs) and a tt_number to get a review they made on a specific tt_number movie.
     var decoded = req.app.locals.decoded;
     var username = req.params.username;
-    var tt_number = parseInt(req.params.tt_number);
+    var imdb_tt_number = req.params.tt_number;
+    // var tt_number = parseInt(req.params.tt_number);
 
-    if (isNaN(username) && isNaN(tt_number) === false) {
+    if (isNaN(username) && isNaN(imdb_tt_number)) {
         var tokenUsername = decoded.username;
 
         if (tokenUsername === username) {
             //Check if the authorized user is the user they are requesting to see.
-            Rating.find({'username': username, 'tt_number': tt_number}, {'_id': 0, '__v': 0}, function (err, rating) {
+            Rating.find({'username': username, 'imdb_tt_number': imdb_tt_number}, {'_id': 0, '__v': 0}, function (err, rating) {
 
                 if (err) {
                     res.status(500);

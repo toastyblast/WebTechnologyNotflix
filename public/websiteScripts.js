@@ -207,8 +207,45 @@ function completeLogout() {
     location.reload();
 }
 
+function ratingSearchFormFunction() {
+    var soughtTTNumber = $("#ratingSearchQuery").val();
+
+    var userToken = localStorage.getItem("authorization");
+    var userName = localStorage.getItem("latestUserName");
+    var url = "http://localhost:3000/api/ratings/" + userName;
+
+    $("#ratingRow").empty();
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            if (this.status === 200) {
+                var response = JSON.parse(this.responseText);
+
+                ratings(response);
+            } else {
+                var errorResponse = JSON.parse(this.responseText);
+                var errorMessage = errorResponse.errorMessage;
+
+                console.log(errorMessage)
+                //TODO: Error handling
+            }
+        }
+    };
+
+    if (soughtTTNumber !== '') {
+        soughtTTNumber = "tt" + soughtTTNumber;
+        xhttp.open("GET", url + "/" + soughtTTNumber, true);
+    } else {
+        xhttp.open("GET", url, true);
+    }
+    xhttp.setRequestHeader('authorization', userToken);
+    xhttp.send();
+
+    return false;
+}
+
 function completeMyRatings() {
-    //TODO: Show a page with all of the user's ratings, and an option for them to search for specific ratings of theirs or make a new rating.
     $(".jumbotron").hide();
     $(".container").hide();
     $("#result").load("ratings.html");
@@ -223,30 +260,7 @@ function completeMyRatings() {
             if (this.status === 200) {
                 var response = JSON.parse(this.responseText);
 
-                for (var i = 0; i < response.length; i++) {
-                    var imdb_number = response[i].imdb_tt_number;
-                    var number = response[i].tt_number;
-
-                    //TODO - IDEA: Place movie title in header instead of the rating number.
-
-                    var newIn = "<div class=\"col-md-4\">\n" +
-                        "            <div class=\"card\" style=\"width: 20rem;\">" +
-                        "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i+1) + "</h4>\n" +
-                        "                <div class=\"card-body\">\n" +
-                        "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
-                        "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
-                        "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-info\">Edit</a>\n" +
-                        "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-danger\">Remove</a>\n" +
-                        "                </div>\n" +
-                        "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
-                        "            </div>\n" +
-                        "        </div>\n";
-                    $("#ratingRow").append(newIn);
-
-                    //TODO:
-                    // changeButtonClick(i, number);
-                    removeButtonClick(i, number);
-                }
+                ratings(response);
             } else {
                 var errorResponse = JSON.parse(this.responseText);
                 var errorMessage = errorResponse.errorMessage;
@@ -261,6 +275,33 @@ function completeMyRatings() {
     xhttp.send();
 }
 
+function ratings(response) {
+    for (var i = 0; i < response.length; i++) {
+        var imdb_number = response[i].imdb_tt_number;
+        var number = response[i].tt_number;
+
+        //TODO - IDEA: Place movie title in header instead of the rating number.
+
+        var newIn = "<div class=\"col-md-4\">\n" +
+            "            <div class=\"card\" style=\"width: 20rem;\">" +
+            "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i+1) + "</h4>\n" +
+            "                <div class=\"card-body\">\n" +
+            "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
+            "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
+            "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-info\">Edit</a>\n" +
+            "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-danger\">Remove</a>\n" +
+            "                </div>\n" +
+            "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
+            "            </div>\n" +
+            "        </div>\n";
+        $("#ratingRow").append(newIn);
+
+        //TODO:
+        // changeButtonClick(i, number);
+        removeButtonClick(i, number);
+    }
+}
+
 function removeButtonClick(i, tt_number) {
     var token = localStorage.getItem('authorization');
     var username = localStorage.getItem("latestUserName");
@@ -273,6 +314,7 @@ function removeButtonClick(i, tt_number) {
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4) {
                 if (this.status === 200) {
+                    //Reload the page, so that the list resets all the counters and places the still existing items nicely.
                     completeMyRatings();
                 } else {
                     var errorResponse = JSON.parse(this.responseText);
