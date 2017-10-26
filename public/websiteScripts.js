@@ -225,6 +225,7 @@ function completeMyRatings() {
 
                 for (var i = 0; i < response.length; i++) {
                     var imdb_number = response[i].imdb_tt_number;
+                    var number = response[i].tt_number;
 
                     //TODO - IDEA: Place movie title in header instead of the rating number.
 
@@ -234,8 +235,8 @@ function completeMyRatings() {
                         "                <div class=\"card-body\">\n" +
                         "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
                         "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
-                        "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-primary\">Edit</a>\n" +
-                        "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-primary\">Remove</a>\n" +
+                        "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-info\">Edit</a>\n" +
+                        "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-danger\">Remove</a>\n" +
                         "                </div>\n" +
                         "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
                         "            </div>\n" +
@@ -244,14 +245,13 @@ function completeMyRatings() {
 
                     //TODO:
                     // changeButtonClick(i, number);
-                    removeButtonClick(i, imdb_number);
+                    removeButtonClick(i, number);
                 }
             } else {
                 var errorResponse = JSON.parse(this.responseText);
                 var errorMessage = errorResponse.errorMessage;
 
                 console.log(errorMessage)
-
                 //TODO: Error handling
             }
         }
@@ -262,7 +262,31 @@ function completeMyRatings() {
 }
 
 function removeButtonClick(i, tt_number) {
-    //...
+    var token = localStorage.getItem('authorization');
+    var username = localStorage.getItem("latestUserName");
+
+    var url = "http://localhost:3000/api/ratings/" + username + "/" + tt_number;
+
+    $("#RemoveRating"+i).click(function () {
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4) {
+                if (this.status === 200) {
+                    completeMyRatings();
+                } else {
+                    var errorResponse = JSON.parse(this.responseText);
+                    var errorMessage = errorResponse.errorMessage;
+
+                    console.log(errorMessage)
+                    //TODO: Handle errors.
+                }
+            }
+        };
+        xhttp.open("DELETE", url, true);
+        xhttp.setRequestHeader("authorization", token);
+        xhttp.send();
+    });
 }
 
 function getIMG(tt_number, title) {

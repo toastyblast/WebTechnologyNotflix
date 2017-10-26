@@ -13,9 +13,12 @@
             </p>
             <p>
             <form name="ratingSearchForm" class="form-inline my-2 my-lg-0" onsubmit="return ratingSearchFormFunction()">
-                <input name="ratingSearchQuery" class="form-control mr-sm-2 col-md-5" type="text"
-                       placeholder="IMDB TT number..."
-                       aria-label="RatingSearch">
+                <div class="input-group mr-sm-2 col-md-5">
+                    <div class="input-group-addon">tt</div>
+                    <input name="ratingSearchQuery" class="form-control" type="text"
+                           placeholder="IMDB TT number..."
+                           aria-label="RatingSearch" pattern="[0-9]{7}">
+                </div>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
             </p>
@@ -27,16 +30,19 @@
             <form name="ratingCreationForm" method="post" onsubmit="return ratingCreateFormFunction()">
                 <div class="form-group">
                     <label for="ratingMovieBox">Rated movie TT number:</label>
-                    <input id="ratingMovieBox" class="form-control mr-sm-2 col-md-5" type="text"
-                           placeholder="IMDB TT number..."
-                           aria-label="RatingMovieBox" required>
-                    <span class="help-block text-muted">If you're not sure what the TT number of the movie you want to rate is, take a look at our catalog!</span>
+                    <div class="input-group mr-sm-2 col-md-5">
+                        <div class="input-group-addon">tt</div>
+                        <input id="ratingMovieBox" class="form-control" type="text"
+                               placeholder="IMDB TT number..."
+                               aria-label="RatingMovieBox" pattern="[0-9]{7}" required>
+                    </div>
+                    <span class="help-block text-muted">Fill in 7 digits only. If you're not sure what the TT number of the movie you want to rate is, take a look at our catalog!</span>
                 </div>
                 <div class="form-group">
                     <label for="ratingScoreBox">Rating score:</label>
                     <input id="ratingScoreBox" class="form-control mr-sm-2 col-md-3" type="number"
                            placeholder="Score..."
-                           aria-label="RatingScoreBox" min="0.0" max="5.0" step="0.5" required>
+                           aria-label="RatingScoreBox" value="2.5" min="0.0" max="5.0" step="0.5" required>
                     <span class="help-block text-muted">Scores must be between 0.0 and 5.0 inclusive and in increments of X.0 or X.5</span>
                 </div>
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Post</button>
