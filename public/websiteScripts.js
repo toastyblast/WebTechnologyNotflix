@@ -325,7 +325,7 @@ function buttonClick(i, title) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-
+                window(alert(title + " has been added to your favourites list.\nCurrent list: " + JSON.parse(this.responseText).favourites));
             }
         };
         xhttp.open("PUT", "http://localhost:3000/api/users/favourites/"+title, true);
@@ -382,7 +382,7 @@ function movies(response) {
         var url = localStorage.getItem('' + title + '');
 
         var newIn = "<div class=\"col-md-4\">\n" +
-            "            <div class=\"card\" style=\"width: 20rem;\">" +
+            "            <div class=\"card\" style=\"width: 20rem;min-height: 60rem\">" +
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
             "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
             "                <div class=\"card-body\">\n" +
