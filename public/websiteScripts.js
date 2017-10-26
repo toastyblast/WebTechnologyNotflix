@@ -224,13 +224,15 @@ function completeMyRatings() {
                 var response = JSON.parse(this.responseText);
 
                 for (var i = 0; i < response.length; i++) {
-                    var number = response[i].tt_number;
+                    var imdb_number = response[i].imdb_tt_number;
+
+                    //TODO - IDEA: Place movie title in header instead of the rating number.
 
                     var newIn = "<div class=\"col-md-4\">\n" +
                         "            <div class=\"card\" style=\"width: 20rem;\">" +
                         "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i+1) + "</h4>\n" +
                         "                <div class=\"card-body\">\n" +
-                        "                    <h5 class=\"card-title\">Movie TT number: " + number + "</h5>\n" +
+                        "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
                         "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
                         "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-primary\">Edit</a>\n" +
                         "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-primary\">Remove</a>\n" +
@@ -242,7 +244,7 @@ function completeMyRatings() {
 
                     //TODO:
                     // changeButtonClick(i, number);
-                    // removeButtonClick(i, number);
+                    removeButtonClick(i, imdb_number);
                 }
             } else {
                 var errorResponse = JSON.parse(this.responseText);
@@ -257,6 +259,10 @@ function completeMyRatings() {
     xhttp.open("GET", url, true);
     xhttp.setRequestHeader('authorization', userToken);
     xhttp.send();
+}
+
+function removeButtonClick(i, tt_number) {
+    //...
 }
 
 function getIMG(tt_number, title) {

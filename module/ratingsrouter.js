@@ -250,10 +250,11 @@ router.delete('/:username/:tt_number', function (req, res) {
 // MIDDLEWARE FOR CHECKING IF GIVEN RATING POST & PUT BODIES ARE CORRECT
 router.use(function (req, res, next) {
     //Needs a JSON file in the body with a giventt_number and a givenRating of 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 or 5.0
+    var given_imdb_tt_number = req.body.imdb_tt_number;
     var giventt_number = parseInt(req.body.tt_number);
     var givenRating = parseFloat(req.body.rating);
 
-    if (giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
+    if (given_imdb_tt_number !== undefined && giventt_number !== undefined && givenRating !== undefined && isNaN(giventt_number) === false && isNaN(givenRating) === false) {
 
         if (givenRating >= 0.0 && givenRating <= 5.0) {
             //Make sure the givenRating is between (non-including) 0.0 and (including) 5.0
@@ -266,6 +267,7 @@ router.use(function (req, res, next) {
 
                 //And now that we know that the ratings are valid, then store them so that the commands found under this
                 // one can use them, safely knowing their middleware checked them.
+                req.app.locals.given_imdb_tt_number = given_imdb_tt_number;
                 req.app.locals.giventt_number = giventt_number;
                 req.app.locals.givenRating = givenRating;
 
@@ -288,10 +290,11 @@ router.post('/', function (req, res) {
     //Due to the middleware we already know that the given rating is valid (between 0.0 and 5.0 included and in increments of 0.5).
     var decoded = req.app.locals.decoded;
     var tokenUsername = decoded.username;
+    var given_imdb_tt_number = req.app.locals.given_imdb_tt_number;
     var giventt_number = req.app.locals.giventt_number;
     var givenRating = req.app.locals.givenRating;
 
-    Rating.find({'tt_number': giventt_number}, function (err, ratings) {
+    Rating.find({'imdb_tt_number': given_imdb_tt_number, 'tt_number': giventt_number}, function (err, ratings) {
         //Now go through checks to see if this new givenRating is actually unique.
         if (err) {
             res.status(500);
@@ -314,6 +317,7 @@ router.post('/', function (req, res) {
             //There is no givenRating for this movie yet from the user that is requesting this post command, so create it!
             //Create the new rating.
             var post = new Rating({
+                imdb_tt_number: given_imdb_tt_number,
                 tt_number: giventt_number,
                 username: tokenUsername,
                 rating: givenRating
@@ -340,10 +344,11 @@ router.put('/', function (req, res) {
     //Due to the middleware we already know that the given rating is valid (between 0.0 and 5.0 included and in increments of 0.5).
     var decoded = req.app.locals.decoded;
     var tokenUsername = decoded.username;
+    var given_imdb_tt_number = req.app.locals.given_imdb_tt_number;
     var giventt_number = req.app.locals.giventt_number;
     var givenRating = req.app.locals.givenRating;
 
-    Rating.find({'tt_number': giventt_number, 'username': tokenUsername}, function (err, ratings) {
+    Rating.find({'imdb_tt_number': given_imdb_tt_number, 'tt_number': giventt_number, 'username': tokenUsername}, function (err, ratings) {
         //Then find a rating with the given tt_number and the username of the authorized user.
         if (err) {
             res.status(500);
@@ -354,6 +359,7 @@ router.put('/', function (req, res) {
         if (ratings.length > 0) {
             //Check if there's actually a rating for this user and this movie...
             Rating.update({
+                'imdb_tt_number': given_imdb_tt_number,
                 'tt_number': giventt_number,
                 'username': tokenUsername
             }, {'$set': {'rating': givenRating}}, function (err) {

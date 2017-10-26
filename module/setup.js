@@ -307,6 +307,7 @@ router.post('/', function (req, res) {
 
         /* CREATE THE RATINGS */
         var post7 = new Rating({
+            imdb_tt_number: 'tt1490017',
             tt_number: 123,
             username: 'toastyblast',
             rating: 4.5
@@ -319,7 +320,8 @@ router.post('/', function (req, res) {
         });
 
         var post8 = new Rating({
-            tt_number: 123,
+            imdb_tt_number: 'tt1431045',
+            tt_number: 226,
             username: 'sswxyz17',
             rating: 4.0
         });
@@ -331,7 +333,8 @@ router.post('/', function (req, res) {
         });
 
         var post9 = new Rating({
-            tt_number: 123,
+            imdb_tt_number: 'tt1431045',
+            tt_number: 226,
             username: 'skellyton',
             rating: 3.0
         });
@@ -343,7 +346,8 @@ router.post('/', function (req, res) {
         });
 
         var post10 = new Rating({
-            tt_number: 789,
+            imdb_tt_number: 'tt1431045',
+            tt_number: 226,
             username: 'skellyton',
             rating: 2.0
         });
@@ -355,6 +359,7 @@ router.post('/', function (req, res) {
         });
 
         var post11 = new Rating({
+            imdb_tt_number: 'tt1663662',
             tt_number: 789,
             username: 'toastyblast',
             rating: 0.0

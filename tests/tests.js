@@ -402,6 +402,7 @@ describe("Ratings routings tests", function () {
                 // might've changed as the server is being used, so just give it some default value.
             })
             .expect(200, [{
+                'imdb_tt_number': 'tt1490017',
                 'tt_number': 123,
                 'username': 'toastyblast',
                 'rating': 3.5,
@@ -412,7 +413,7 @@ describe("Ratings routings tests", function () {
     //ROUTING TESTS FOR POST /api/ratings/ AND THE MIDDLEWARE USED TO CHECK IF THE RATINGS ARE VALID
     it("Should not add rating as the items are identified wrong (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_numb': 123, 'rate': 4.5};
+        var ratingToAdd = {'imdb_tt_numb': 'tt1490017', 'tt_numb': 123, 'rate': 4.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -424,7 +425,7 @@ describe("Ratings routings tests", function () {
     //Middleware...
     it("Should not add rating as the rating is higher than 5.0 (or smaller than 0.0) (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number': 123, 'rating': 6.5};
+        var ratingToAdd = {'imdb_tt_number': 'tt1490017', 'tt_number': 123, 'rating': 6.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -436,7 +437,7 @@ describe("Ratings routings tests", function () {
     //Middleware...
     it("Should not add rating as the rating is not in increments of X.0 or X.5 (400)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number': 123, 'rating': 3.3};
+        var ratingToAdd = {'imdb_tt_number': 'tt1490017', 'tt_number': 123, 'rating': 3.3};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -447,7 +448,7 @@ describe("Ratings routings tests", function () {
 
     it("Should not add rating as the user already has a rating on this movie (409)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number': 123, 'rating': 4.0}; //Actual rating on tt_number 123 has a score of 4.5
+        var ratingToAdd = {'imdb_tt_number': 'tt1490017','tt_number': 123, 'rating': 4.0}; //Actual rating on tt_number 123 has a score of 4.5
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -458,7 +459,7 @@ describe("Ratings routings tests", function () {
 
     it("Should add a new rating under this user's name (201)", function (done) {
         //Should be tt_number and rating.
-        var ratingToAdd = {'tt_number': 456, 'rating': 0.5};
+        var ratingToAdd = {'imdb_tt_number': 'tt0095016', 'tt_number': 456, 'rating': 0.5};
 
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -469,6 +470,7 @@ describe("Ratings routings tests", function () {
             })
             .expect(201, {
                 '__v': 0,
+                'imdb_tt_number': 'tt0095016',
                 'tt_number': 456,
                 'username': 'toastyblast',
                 'rating': 0.5,
@@ -480,7 +482,7 @@ describe("Ratings routings tests", function () {
     /* -=- ROUTING TESTS FOR PUT /api/ratings/ -=- */
     it(("Should not update a rating that does not exist under this tt_number and/or username (404)"), function (done) {
         //Should be tt_number and rating.
-        var ratingToChange = {'tt_number': 1234567890, 'rating': 1.0};
+        var ratingToChange = {'imdb_tt_number': 'tt1234567', 'tt_number': 1234567890, 'rating': 1.0};
 
         server.put('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
@@ -491,7 +493,7 @@ describe("Ratings routings tests", function () {
 
     it("Should change the rating for the specified movie under this user's name (200)", function (done) {
         //Should be tt_number and rating.
-        var ratingToChange = {'tt_number': 456, 'rating': 1.0};
+        var ratingToChange = {'imdb_tt_number': 'tt0095016', 'tt_number': 456, 'rating': 1.0};
 
         server.put('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
