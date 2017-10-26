@@ -33,7 +33,7 @@ router.get('/', function (req, res) {
     } else if (req.query.ttnumber !== undefined) {
         //If the user search for a movie by a tt_number, check each movie's tt_number if it equals the query number.
         //If it does add it to the answer string and in the end print it.
-        Movie.paginate({ "tt_number": { "$regex": ""+req.query.tt_number+"", "$options": "i" } },{ offset: parseInt(req.query.pag)*3, limit: 3 }, function (err, movies) {
+        Movie.paginate({ "imdb_tt_number": req.query.ttnumber },{ offset: 0, limit: 3 }, function (err, movies) {
             res.json(movies);
         });
     } else if (req.query.pag !== undefined){
