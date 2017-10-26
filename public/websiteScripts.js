@@ -41,29 +41,11 @@ $(document).ready(function () {
                 if (this.readyState === 4 && this.status === 200) {
                     var response = JSON.parse(this.responseText);
 
-                    for (var i = 0; i < response.length; i++) {
-                        var number = response[i].imdb_tt_number;
-                        var title = response[i].title;
+                    movies(response.docs);
+                    addButtons(response.total, function () {
+                        newFunction();
 
-                        var url = localStorage.getItem('' + title + '');
-
-                        var newIn = "<div class=\"col-md-4\">\n" +
-                            "            <div class=\"card\" style=\"width: 20rem;\">" +
-                            "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
-                            "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
-                            "                <div class=\"card-body\">\n" +
-                            "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
-                            "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
-                            "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
-                            "                </div>\n" +
-                            "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
-                            "            </div>\n" +
-                            "        </div>\n";
-                        $("#movieRow").append(newIn);
-
-                        buttonClick(i, title);
-                    }
-                    newFunction();
+                    });
                 }
             };
             xhttp.open("GET", "http://localhost:3000/api/movies/", true);
@@ -137,38 +119,23 @@ function formFunction() {
         if (this.readyState === 4 && this.status === 200) {
             var response = 0;
             response = JSON.parse(this.responseText);
-            for (var i = 0; i < response.Movies.length; i++) {
-                var number = response.Movies[i].imdb_tt_number;
-                var title = response.Movies[i].title;
-                // getIMG(number, title);
-                var url = localStorage.getItem(''+response.Movies[i].title+'');
-                var newIn = "<div class=\"col-md-4\">\n" +
-                    "            <div class=\"card\" style=\"width: 20rem;\">\n" +
-                    "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">" +
-                    "                <div class=\"card-body\">" +
-                    "                    <h4 class=\"card-title\">" + response.Movies[i].title + "</h4>\n" +
-                    "                    <h5 class=\"card-title\">" + response.Movies[i].director + "</h5>\n" +
-                    "                    <p class=\"card-text\">" + response.Movies[i].description + "</p>\n" +
-                    "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
-                    "                </div>\n" +
-                    "            </div>\n" +
-                    "        </div>";
-                $("#movieRow").append(newIn);
-                buttonClick(i, title)
-            }
+            movies(response.docs);
+            addButtons(response.total, function () {
+                newFunction(searchCategory+"="+searchQuery)
+            });
         }
     };
     if (searchCategory === "Title") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?title=" + searchQuery, true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?title=" + searchQuery+"&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "Director") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?director=" + searchQuery, true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?director=" + searchQuery+"&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "Description") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?description=" + searchQuery, true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?description=" + searchQuery+"&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "tt_number") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + searchQuery, true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + searchQuery+"&pag=0", true);
         // xhttp.send();
     }
     xhttp.send();
@@ -367,31 +334,25 @@ function buttonClick(i, title) {
     });
 }
 
-function  newFunction() {
+//Function to bind buttons for pagination.
+function  newFunction(query) {
+    $(".page-item").off();
     $(".page-item").click(function () {
         $("#movieRow").empty();
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 var response = JSON.parse(this.responseText);
-                for (var i = 0 ; i < response.length ; i++){
-                    var url = localStorage.getItem(''+response[i].title+'');
-                    var newIn = "<div class=\"col-md-4\">\n" +
-                        "            <div class=\"card\" style=\"width: 20rem;\">\n" +
-                        "                <img class=\"card-img-top\" src="+url+" alt=\"Card image cap\">" +
-                        "                <div class=\"card-body\">" +
-                        "                    <h4 class=\"card-title\">" + response[i].title + "</h4>\n" +
-                        "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
-                        "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
-                        "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
-                        "                </div>\n" +
-                        "            </div>\n" +
-                        "        </div>";
-                    $("#movieRow").append(newIn);
-                }
+                movies(response.docs);
             }
         };
-        xhttp.open("GET", "http://localhost:3000/api/movies/?pag="+($(this).text()), true);
+        if (query !== undefined){
+            var str = query.toLowerCase();
+            xhttp.open("GET", "http://localhost:3000/api/movies/?"+str+"&pag="+($(this).text()), true);
+        }else {
+            xhttp.open("GET", "http://localhost:3000/api/movies/?pag="+($(this).text()), true);
+        }
+
         xhttp.send();
     })
 }
@@ -411,5 +372,41 @@ function getAllImages() {
     };
     xhttp.open("GET", "http://localhost:3000/api/movies/all", true);
     xhttp.send();
+}
+
+function movies(response) {
+    for (var i = 0; i < response.length; i++) {
+        var number = response[i].imdb_tt_number;
+        var title = response[i].title;
+
+        var url = localStorage.getItem('' + title + '');
+
+        var newIn = "<div class=\"col-md-4\">\n" +
+            "            <div class=\"card\" style=\"width: 20rem;\">" +
+            "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
+            "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
+            "                <div class=\"card-body\">\n" +
+            "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
+            "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
+            "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
+            "                </div>\n" +
+            "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
+            "            </div>\n" +
+            "        </div>\n";
+        $("#movieRow").append(newIn);
+
+        buttonClick(i, title);
+    }
+}
+
+function addButtons(number, callback) {
+    $(".pagination").empty();
+    var int = 0;
+    while (number > 0){
+        $(".pagination").append(" <li class=\"page-item\"><a class=\"page-link\" href=\"#\">"+int+"</a></li>");
+        int = int +1;
+        number = number-3;
+    }
+    callback();
 }
 //...
