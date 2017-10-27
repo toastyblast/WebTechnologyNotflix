@@ -30,3 +30,7 @@ body {
 #logout-button {
     margin-left: 14px;
 }
+
+a.btn.btn-danger {
+    margin-left: 8px;
+}

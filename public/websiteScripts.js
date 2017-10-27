@@ -362,9 +362,12 @@ function ratings(response) {
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i + 1) + "</h4>\n" +
             "                <div class=\"card-body\">\n" +
             "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
-            "                    <input id=\"ratingCardScoreBox" + i + "\" class=\"form-control mr-sm-2 col-md-3\" type=\"number\" placeholder=\"Score...\" aria-label=\"RatingCardScoreBox\" value=\"" + response[i].rating + "\" min=\"0.0\" max=\"5.0\" step=\"0.5\" required>\n" +
-            "                    <a id=\"ChangeRating" + i + "\" class=\"btn btn-info\">Edit</a>\n" +
-            "                    <a id=\"RemoveRating" + i + "\" class=\"btn btn-danger\">Remove</a>\n" +
+            "                    <label for=\"ratingCardScoreBox\">Your rating:</label>\n" +
+            "                    <div class=\"form-inline\">\n" +
+            "                       <input id=\"ratingCardScoreBox" + i + "\" class=\"form-control mr-sm-2 col-md-4\" type=\"number\" placeholder=\"Score...\" aria-label=\"RatingCardScoreBox\" value=\"" + response[i].rating + "\" min=\"0.0\" max=\"5.0\" step=\"0.5\" required>\n" +
+            "                       <a id=\"ChangeRating" + i + "\" class=\"btn btn-info\">Edit</a>\n" +
+            "                       <a id=\"RemoveRating" + i + "\" class=\"btn btn-danger\">Remove</a>\n" +
+            "                    </div>\n" +
             "                </div>\n" +
             "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
             "            </div>\n" +
