@@ -180,15 +180,24 @@ function completeFunction() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 201) {
-            // window.alert(JSON.parse(this.responseText));
-        } else {
-            // window.alert(this.responseText);
+            $("#topContainer").append("<div class=\"alert alert-success alert-dismissable\">\n" +
+                "            <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                "            <strong>Success!</strong> This alert box could indicate a successful or positive action.\n" +
+                "        </div>");
+            $("#form")[0].reset();
+        } else if (this.readyState === 4 && this.status === 409){
+           $("#topContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+               "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+               "    <strong>Danger!</strong>"+JSON.parse(this.responseText).errorMessage+"" +
+               "  </div>");
+        } else if (this.readyState ===4 && this.status === 400){
+            $("#topContainer").append("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                "    <strong>Warning!</strong>"+JSON.parse(this.responseText).errorMessage+"" +
+                "  </div>");
         }
-        // window.alert(this.responseText);
     };
     xhttp.open("POST", 'http://localhost:3000/api/users/', true);
-    // xhttp.setRequestHeader("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4Nzc0NTk0LCJleHAiOjE1MTExOTM3OTR9.3QynZmUjP74Goaligk-FA9HAt50op3r6sy2pqtCyDvc");
-    // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify(data));
 
