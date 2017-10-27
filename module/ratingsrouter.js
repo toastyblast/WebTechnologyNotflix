@@ -40,10 +40,10 @@ router.get('/', function (req, res) {
                     var average = 0;
 
                     for (amountOfRatings = 0; amountOfRatings < movieRatings.length; amountOfRatings++) {
-                        average += parseInt(movieRatings[amountOfRatings].rating);
+                        average += parseFloat(movieRatings[amountOfRatings].rating);
                     }
 
-                    average = Math.round((average / amountOfRatings) * 100) / 100;
+                    average = Math.round((average / amountOfRatings) * 10) / 10;
 
                     //Add the average rating for this movie to the response jsonString.
                     obj["theAverageRatings"].push({
@@ -87,10 +87,10 @@ router.get('/:search', function (req, res) {
                 var average = 0;
 
                 for (amountOfRatings = 0; amountOfRatings < ratings.length; amountOfRatings++) {
-                    average += parseInt(ratings[amountOfRatings].rating);
+                    average += parseFloat(ratings[amountOfRatings].rating);
                 }
 
-                average = Math.round((average / amountOfRatings) * 100) / 100;
+                average = Math.round((average / amountOfRatings) * 10) / 10;
 
                 res.status(200);
                 res.json({

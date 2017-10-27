@@ -362,7 +362,7 @@ function getMovieFakeTT() {
  */
 function ratingCreateFormFunction(databaseTTNumber) {
     var givenTTNumber = $("#ratingMovieBox").val();
-    var givenScore = $("#ratingScoreBox").val();
+    var givenScore = parseFloat($("#ratingScoreBox").val());
 
     var userToken = localStorage.getItem("authorization");
 
@@ -514,7 +514,7 @@ function changeButtonClick(i, imdb_number, number) {
     var userToken = localStorage.getItem("authorization");
 
     $("#ChangeRating" + i).click(function () {
-        var newScore = $("#ratingCardScoreBox" + i).val();
+        var newScore = parseFloat($("#ratingCardScoreBox" + i).val());
 
         var data = {
             "imdb_tt_number": imdb_number,
@@ -742,6 +742,7 @@ function getAllImages() {
 function movies(response) {
     for (var i = 0; i < response.length; i++) {
         var number = response[i].imdb_tt_number;
+        var fakeNumber = response[i].tt_number;
         var title = response[i].title;
 
         var url = localStorage.getItem('' + title + '');
@@ -761,7 +762,29 @@ function movies(response) {
         $("#movieRow").append(newIn);
 
         buttonClick(i, title);
+
+        getRatingOfSpecificMovie(i, fakeNumber)
     }
+}
+
+function getRatingOfSpecificMovie(index, tt_number) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200) {
+                var response = JSON.parse(this.responseText);
+
+                $("#" + index).before("<p class=\"card-text\">Average rating: " + response.averageRating + "</p>\n");
+            } else {
+                $("#" + index).before("<p class=\"card-text\">Average rating: None yet!</p>\n");
+            }
+        }
+    };
+
+    xhttp.open("GET", "http://localhost:3000/api/ratings/" + tt_number, true);
+    xhttp.send();
+
+    return false;
 }
 
 function addButtons(number, callback) {
