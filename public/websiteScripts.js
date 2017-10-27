@@ -185,15 +185,15 @@ function completeFunction() {
                 "            <strong>Success!</strong> This alert box could indicate a successful or positive action.\n" +
                 "        </div>");
             $("#form")[0].reset();
-        } else if (this.readyState === 4 && this.status === 409){
-           $("#topContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
-               "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
-               "    <strong>Danger!</strong>"+JSON.parse(this.responseText).errorMessage+"" +
-               "  </div>");
-        } else if (this.readyState ===4 && this.status === 400){
+        } else if (this.readyState === 4 && this.status === 409) {
+            $("#topContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                "    <strong>Danger!</strong>" + JSON.parse(this.responseText).errorMessage + "" +
+                "  </div>");
+        } else if (this.readyState === 4 && this.status === 400) {
             $("#topContainer").append("<div class=\"alert alert-warning alert-dismissable\">\n" +
                 "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
-                "    <strong>Warning!</strong>"+JSON.parse(this.responseText).errorMessage+"" +
+                "    <strong>Warning!</strong>" + JSON.parse(this.responseText).errorMessage + "" +
                 "  </div>");
         }
     };
@@ -357,14 +357,12 @@ function ratings(response) {
         var imdb_number = response[i].imdb_tt_number;
         var number = response[i].tt_number;
 
-        //TODO - IDEA: Place movie title in header instead of the rating number.
-
         var newIn = "<div class=\"col-md-4\">\n" +
             "            <div class=\"card\" style=\"width: 20rem;\">" +
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i + 1) + "</h4>\n" +
             "                <div class=\"card-body\">\n" +
             "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
-            "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
+            "                    <input id=\"ratingCardScoreBox" + i + "\" class=\"form-control mr-sm-2 col-md-3\" type=\"number\" placeholder=\"Score...\" aria-label=\"RatingCardScoreBox\" value=\"" + response[i].rating + "\" min=\"0.0\" max=\"5.0\" step=\"0.5\" required>\n" +
             "                    <a id=\"ChangeRating" + i + "\" class=\"btn btn-info\">Edit</a>\n" +
             "                    <a id=\"RemoveRating" + i + "\" class=\"btn btn-danger\">Remove</a>\n" +
             "                </div>\n" +
@@ -373,10 +371,47 @@ function ratings(response) {
             "        </div>\n";
         $("#ratingRow").append(newIn);
 
-        //TODO:
-        // changeButtonClick(i, number);
+        changeButtonClick(i, imdb_number, number);
         removeButtonClick(i, number);
     }
+}
+
+function changeButtonClick(i, imdb_number, number) {
+    var userToken = localStorage.getItem("authorization");
+
+    $("#ChangeRating" + i).click(function () {
+        var newScore = $("#ratingCardScoreBox" + i).val();
+
+        var data = {
+            "imdb_tt_number": imdb_number,
+            "tt_number": number,
+            "rating": newScore
+        };
+
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    //The rating has been updated, so now reload the div with ratings and it should be there!
+                    completeMyRatings();
+                } else {
+                    var errorResponse = JSON.parse(xhttp.responseText);
+                    var errorMessage = errorResponse.errorMessage;
+
+                    console.log(errorMessage)
+                    //TODO: Error handling
+                }
+            }
+        };
+
+        console.log(JSON.stringify(data));
+
+        xhttp.open("PUT", "http://localhost:3000/api/ratings/", true);
+        xhttp.setRequestHeader('authorization', userToken);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send(JSON.stringify(data));
+    });
 }
 
 function removeButtonClick(i, tt_number) {
@@ -469,14 +504,15 @@ function getUsers(search) {
 
 function buttonClick(i, title) {
     var token = localStorage.getItem('authorization');
-    $("#" + i).click(function () {
 
+    $("#" + i).click(function () {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 window(alert(title + " has been added to your favourites list.\nCurrent list: " + JSON.parse(this.responseText).favourites));
             }
         };
+
         xhttp.open("PUT", "http://localhost:3000/api/users/favourites/" + title, true);
         xhttp.setRequestHeader("authorization", token);
         xhttp.send();
@@ -511,12 +547,12 @@ function getAllImages() {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             var response = JSON.parse(this.responseText);
+
             for (var i = 0; i < response.length; i++) {
                 var number = response[i].imdb_tt_number;
                 var title = response[i].title;
                 getIMG(number, title);
             }
-
         }
     };
     xhttp.open("GET", "http://localhost:3000/api/movies/all", true);
@@ -531,7 +567,7 @@ function movies(response) {
         var url = localStorage.getItem('' + title + '');
 
         var newIn = "<div class=\"col-md-4\">\n" +
-            "            <div class=\"card\" style=\"width: 20rem;min-height: 60rem\">" +
+            "            <div class=\"card\" style=\"width: 20rem\">" +
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
             "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
             "                <div class=\"card-body\">\n" +

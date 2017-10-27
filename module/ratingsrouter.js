@@ -48,11 +48,15 @@ router.get('/', function (req, res) {
                     //Add the average rating for this movie to the response jsonString.
                     obj["theAverageRatings"].push({
                         averageRatingMessage: 'Movie with tt_number = [' + movie.tt_number + '] has the following average rating.',
-                        averageRating: average
+                        averageRating: average,
+                        movie_tt_number: movie.tt_number
                     });
                 } else {
                     //Add a notice that this movie does not have any ratings and therefore no average rating either to the response jsonString.
-                    obj["theAverageRatings"].push({noRatingMessage: 'Movie with tt_number = [' + movie.tt_number + "] has no ratings yet."});
+                    obj["theAverageRatings"].push({
+                        noRatingMessage: 'Movie with tt_number = [' + movie.tt_number + "] has no ratings yet.",
+                        movie_tt_number: movie.tt_number
+                    });
                 }
 
                 // this is the last one, call done()
