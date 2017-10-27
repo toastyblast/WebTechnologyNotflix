@@ -1,3 +1,6 @@
+/**
+ * Special condition for the case of there being a user logged when the site is reloaded or accessed after it was closed. It makes sure that if the user didn't log out, then they stay logged in (if the token has not expired yet).
+ */
 if (localStorage.getItem("authorization") !== null) {
     //Check if the browser still has a valid token stored, if so, just log them into the user from that token.
     var data = {
@@ -19,6 +22,7 @@ if (localStorage.getItem("authorization") !== null) {
                     "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
                     "</div>");
             } else {
+                //This means the token has expired. Delete the stored data on the user in that case and don't load the logged in items.
                 localStorage.removeItem("authorization");
                 localStorage.removeItem("latestUserName");
             }
@@ -29,9 +33,16 @@ if (localStorage.getItem("authorization") !== null) {
     xhttp.send(JSON.stringify(data));
 }
 
+/**
+ * All functions that are called upon only once the page has fully loaded. Ensures that the user doesn't make use of
+ * some functions too quickly, as replacing items can't happen if the original item hasn't loaded yet, for instance.
+ */
 $(document).ready(function () {
     getAllImages();
 
+    /**
+     * Function triggered when the "Browse catalog" nav link has been clicked. Loads the page of all movies through several methods.
+     */
     $("#catalogButton").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
@@ -44,7 +55,6 @@ $(document).ready(function () {
                     movies(response.docs);
                     addButtons(response.total, function () {
                         newFunction();
-
                     });
                 }
             };
@@ -53,12 +63,19 @@ $(document).ready(function () {
         });
     });
 
+    /**
+     * Function triggered when the "Home" nav link has been clicked. Loads the normal home page for the user.
+     */
     $("#home").click(function () {
         $("#result").empty();
         $(".jumbotron").show();
         $(".container").show();
     });
 
+    /**
+     * Function called when the "Login" button of the login form has been clicked. Handles the response in the way
+     * needed if the login succeeded or not.
+     */
     $('#loginForm').submit(function (event) {
         event.preventDefault();
 
@@ -90,7 +107,7 @@ $(document).ready(function () {
                     var errorResponse = JSON.parse(this.responseText);
                     var errorMessage = errorResponse.errorMessage;
 
-                    //TODO: Let the user know about the issue in some way, like with error bubbles or something.
+                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
                 }
             }
         };
@@ -101,6 +118,9 @@ $(document).ready(function () {
         return false;
     });
 
+    /**
+     * Function called when the "Users" nav link has been clicked. Loads the page with the list of users, made by the getUsers function.
+     */
     $('#users').click(function () {
         getUsers();
     });
@@ -207,15 +227,23 @@ function completeFunction() {
     return false;
 }
 
+/**
+ * Function that is triggered when the user clicks the "Log out" button. It deletes all local data on the user and resets the page.
+ */
 function completeLogout() {
     localStorage.removeItem("authorization");
     localStorage.removeItem("latestUserName");
 
-    //TODO - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
+    //TODO - YORAN - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
 
     location.reload();
 }
 
+/**
+ * Function that handles the event of when a user searches for one of their specific ratings. It sends the specific rating to the ratings function so it can load the card.
+ *
+ * @returns {boolean}
+ */
 function ratingSearchFormFunction() {
     var soughtTTNumber = $("#ratingSearchQuery").val();
 
@@ -237,7 +265,7 @@ function ratingSearchFormFunction() {
                 var errorMessage = errorResponse.errorMessage;
 
                 console.log(errorMessage)
-                //TODO: Error handling
+                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
             }
         }
     };
@@ -256,6 +284,9 @@ function ratingSearchFormFunction() {
     return false;
 }
 
+/**
+ * Helper function that gets the internal database TT number of a movie with the given IMDB TT number. Sends this fake TT number to the ratingCreateFormFunction
+ */
 function getMovieFakeTT() {
     var givenTTNumber = $("#ratingMovieBox").val();
 
@@ -271,17 +302,21 @@ function getMovieFakeTT() {
                 var errorMessage = firstErrorResponse.errorMessage;
 
                 console.log(errorMessage)
-                //TODO: Error handling
+                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
             }
         }
     };
 
     xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=tt" + givenTTNumber + "&pag=0", true);
     xhttp.send();
-
-    return false;
 }
 
+/**
+ * Function that handles when the rating create button is clicked. Calls the database to create said ratings.
+ *
+ * @param databaseTTNumber are the seven valid IMDB TT digits the user has filled in.
+ * @returns {boolean} To prevent standard behaviour of the form.
+ */
 function ratingCreateFormFunction(databaseTTNumber) {
     var givenTTNumber = $("#ratingMovieBox").val();
     var givenScore = $("#ratingScoreBox").val();
@@ -309,7 +344,7 @@ function ratingCreateFormFunction(databaseTTNumber) {
                 var errorMessage = errorResponse.errorMessage;
 
                 console.log(errorMessage)
-                //TODO: Error handling
+                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
             }
         }
     };
@@ -322,6 +357,9 @@ function ratingCreateFormFunction(databaseTTNumber) {
     return false;
 }
 
+/**
+ * Function that loads in the list of rating cards of the user that is currently logged in, when they press the "My ratings" button.
+ */
 function completeMyRatings() {
     $(".jumbotron").hide();
     $(".container").hide();
@@ -343,7 +381,7 @@ function completeMyRatings() {
                 var errorMessage = errorResponse.errorMessage;
 
                 console.log(errorMessage)
-                //TODO: Error handling
+                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
             }
         }
     };
@@ -352,6 +390,11 @@ function completeMyRatings() {
     xhttp.send();
 }
 
+/**
+ * Function that loads the the cards show inside of the div loaded by "completeMyRatings" function.
+ *
+ * @param response is the list of ratings made by the user, given by the function that calls this function.
+ */
 function ratings(response) {
     for (var i = 0; i < response.length; i++) {
         var imdb_number = response[i].imdb_tt_number;
@@ -379,6 +422,13 @@ function ratings(response) {
     }
 }
 
+/**
+ * Function that handles the event when a user clicks the "Edit" button on one of their ratings. Sends this to the database and handles the response.
+ *
+ * @param i is the index of the rating that the user clicked the "Edit" button of.
+ * @param imdb_number is the IMDB TT number of said rating.
+ * @param number is the internal database TT number of said rating.
+ */
 function changeButtonClick(i, imdb_number, number) {
     var userToken = localStorage.getItem("authorization");
 
@@ -403,7 +453,7 @@ function changeButtonClick(i, imdb_number, number) {
                     var errorMessage = errorResponse.errorMessage;
 
                     console.log(errorMessage)
-                    //TODO: Error handling
+                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
                 }
             }
         };
@@ -417,6 +467,12 @@ function changeButtonClick(i, imdb_number, number) {
     });
 }
 
+/**
+ * Function that handles the event when a user clicks the "Remove" button on one of their ratings. Sends this to the database and handles the response.
+ *
+ * @param i is the index of the rating that the user clicked the "Remove" button of.
+ * @param tt_number is the internal database TT number of said rating.
+ */
 function removeButtonClick(i, tt_number) {
     var token = localStorage.getItem('authorization');
     var username = localStorage.getItem("latestUserName");
@@ -436,7 +492,7 @@ function removeButtonClick(i, tt_number) {
                     var errorMessage = errorResponse.errorMessage;
 
                     console.log(errorMessage)
-                    //TODO: Handle errors.
+                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
                 }
             }
         };
