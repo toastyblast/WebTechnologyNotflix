@@ -377,7 +377,7 @@ describe("Ratings routings tests", function () {
 
     /* -=- All tests for the GET /api/ratings/:username/:tt_number routing -=- */
     it("Should not show a specific movie's rating from a different user than the one logged in (403)", function (done) {
-        server.get("/api/ratings/sswxyz17/123") //Different user than the token holder.
+        server.get("/api/ratings/sswxyz17/tt1490017") //Different user than the token holder.
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect('Content-Length', '101') //Length of the appropriate error message.
@@ -385,7 +385,7 @@ describe("Ratings routings tests", function () {
     });
 
     it("Should let the user know when they do not have a rating for that specific movie tt_number (404)", function (done) {
-        server.get("/api/ratings/toastyblast/456") //Different user than the token holder.
+        server.get("/api/ratings/toastyblast/tt4649466") //Different user than the token holder.
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect('Content-Length', '121') //Length of the appropriate error message.
@@ -393,7 +393,7 @@ describe("Ratings routings tests", function () {
     });
 
     it("Should return the logged in user's rating for a specific movie with the tt_number", function (done) {
-        server.get("/api/ratings/toastyblast/123") //Different user than the token holder.
+        server.get("/api/ratings/toastyblast/tt1490017") //Different user than the token holder.
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect(function (res) {
@@ -418,7 +418,7 @@ describe("Ratings routings tests", function () {
         server.post('/api/ratings/')
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .send(ratingToAdd)
-            .expect('Content-Length', '157') //Length of the appropriate error message.
+            .expect('Content-Length', '147') //Length of the appropriate error message.
             .expect(400, done);
     });
 
