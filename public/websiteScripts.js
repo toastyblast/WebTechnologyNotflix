@@ -41,6 +41,19 @@ $(document).ready(function () {
     getAllImages();
 
     /**
+     * Check if the user logged out before this loading. If so, show a little message to let them know.
+     */
+    if (localStorage.getItem("loggedOut") !== null) {
+        //If the page is reloaded because the user logged out, then show a special notice for the user!
+        $("#navbarsExampleDefault").append("<div class=\"alert alert-success alert-dismissable\">\n" +
+            "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+            "    <strong>Success!</strong> You have been logged out.\n" +
+            "  </div>");
+
+        localStorage.removeItem("loggedOut");
+    }
+
+    /**
      * Function triggered when the "Browse catalog" nav link has been clicked. Loads the page of all movies through several methods.
      */
     $("#catalogButton").click(function () {
@@ -90,8 +103,9 @@ $(document).ready(function () {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4) {
+                var response = JSON.parse(this.responseText);
+
                 if (this.status === 201) {
-                    var response = JSON.parse(this.responseText);
                     var token = response.token;
 
                     localStorage.setItem('authorization', token);
@@ -103,11 +117,18 @@ $(document).ready(function () {
                         "   <button class=\"btn btn-outline-success my-2 my-sm-0\" onclick=\"return completeMyRatings()\">My ratings</button>" +
                         "   <button class=\"btn btn-outline-success my-2 my-sm-0\" id=\"logout-button\" onclick=\"return completeLogout()\">Log out</button>" +
                         "</div>");
-                } else {
-                    var errorResponse = JSON.parse(this.responseText);
-                    var errorMessage = errorResponse.errorMessage;
-
-                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+                } else if (this.status === 404) {
+                    //There is no account with this username, let the user know.
+                    $("#loginForm").before("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Warning!</strong> " + response.errorMessage +
+                        "  </div>");
+                } else if (this.status === 400) {
+                    //The combination given by the user is incorrect, or something is wrong code-wise on the server-side
+                    $("#loginForm").before("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Danger!</strong> " + response.errorMessage +
+                        "  </div>");
                 }
             }
         };
@@ -233,10 +254,11 @@ function completeFunction() {
 function completeLogout() {
     localStorage.removeItem("authorization");
     localStorage.removeItem("latestUserName");
+    //Since the user has logged out, set a item that lets the reloaded page know to show a notification telling the
+    // user it successfully happened.
+    localStorage.setItem("loggedOut", true);
 
-    //TODO - YORAN - IDEA - Have a little balloon pop up in the right of the navbar saying they have been successfully logged out.
-
-    location.reload();
+    window.location.reload();
 }
 
 /**
@@ -256,16 +278,35 @@ function ratingSearchFormFunction() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
+            var response = JSON.parse(this.responseText);
+
             if (this.status === 200) {
-                var response = JSON.parse(this.responseText);
-
+                //At least one or more ratings made by the user have been found, show them using this function.
                 ratings(response);
-            } else {
-                var errorResponse = JSON.parse(this.responseText);
-                var errorMessage = errorResponse.errorMessage;
-
-                console.log(errorMessage)
-                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+            } else if (this.status === 400) {
+                //This means something in the request body was wrong, which is most likely caused by programming issues server-side
+                $("#ratingSearchContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage + " Please contact us and let us know what caused this issue." +
+                    "  </div>");
+            } else if (this.status === 403) {
+                //This means the user was not authorized, meaning they had no token, or it expired.
+                $("#ratingSearchContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 404) {
+                //This means that the user either has no ratings, or the movie they searched for does not exist.
+                $("#ratingSearchContainer").append("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Warning!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 500) {
+                //This means something is going on server-side that the user can't do anything about.
+                $("#ratingSearchContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage + " This most likely means that the website is being worked on. Please come back later!" +
+                    "  </div>");
             }
         }
     };
@@ -293,22 +334,24 @@ function getMovieFakeTT() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
-            if (this.status === 200) {
-                var response = JSON.parse(this.responseText);
+            var response = JSON.parse(this.responseText);
 
+            if (this.status === 200) {
                 ratingCreateFormFunction(response.docs[0].tt_number);
             } else {
-                var firstErrorResponse = JSON.parse(this.responseText);
-                var errorMessage = firstErrorResponse.errorMessage;
-
-                console.log(errorMessage)
-                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+                //This means something is going on server-side that the user can't do anything about.
+                $("#ratingSearchContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger - Unknown error!</strong> " + response + " Please contact us about this!" +
+                    "  </div>");
             }
         }
     };
 
     xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=tt" + givenTTNumber + "&pag=0", true);
     xhttp.send();
+
+    return false;
 }
 
 /**
@@ -333,18 +376,38 @@ function ratingCreateFormFunction(databaseTTNumber) {
 
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState === 4) {
+            var response = JSON.parse(this.responseText);
             //Remove the temporarily stored fake TT number just to be sure.
             localStorage.removeItem("temporaryTT");
 
             if (xhttp.status === 201) {
                 //The rating has been created, so now reload the div with ratings and it should be there!
                 completeMyRatings();
-            } else {
-                var errorResponse = JSON.parse(xhttp.responseText);
-                var errorMessage = errorResponse.errorMessage;
-
-                console.log(errorMessage)
-                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+            } else if (this.status === 400) {
+                //This means something in the request body was wrong, which is most likely caused by programming issues
+                // server-side. (Or the user found some way to intercept the request and alter it.)
+                $("#ratingCreateContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Error!</strong> " + response.errorMessage + " Please contact us and let us know what caused this issue." +
+                    "  </div>");
+            } else if (this.status === 403) {
+                //This means the user was not authorized, meaning they had no token, or it expired.
+                $("#ratingCreateContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 409) {
+                //This means that the user already has a rating for the movie they are trying to make a rating for.
+                $("#ratingCreateContainer").append("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Warning!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 500) {
+                //This means something is going on server-side that the user can't do anything about.
+                $("#ratingCreateContainer").append("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage + " This most likely means that the website is being worked on. Please come back later!" +
+                    "  </div>");
             }
         }
     };
@@ -372,16 +435,34 @@ function completeMyRatings() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
+            var response = JSON.parse(this.responseText);
+
             if (this.status === 200) {
-                var response = JSON.parse(this.responseText);
-
                 ratings(response);
-            } else {
-                var errorResponse = JSON.parse(this.responseText);
-                var errorMessage = errorResponse.errorMessage;
-
-                console.log(errorMessage)
-                //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+            } else if (this.status === 400) {
+                //This means something in the request body was wrong, which is most likely caused by programming issues server-side
+                $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage + " Please contact us and let us know what caused this issue." +
+                    "  </div>");
+            } else if (this.status === 403) {
+                //This means the user was not authorized, meaning they had no token, or it expired.
+                $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 404) {
+                //This means that the user either has no ratings, or the movie they searched for does not exist.
+                $("#ratingsListContainer").prepend("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Warning!</strong> " + response.errorMessage +
+                    "  </div>");
+            } else if (this.status === 500) {
+                //This means something is going on server-side that the user can't do anything about.
+                $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                    "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                    "    <strong>Danger!</strong> " + response.errorMessage + " This most likely means that the website is being worked on. Please come back later!" +
+                    "  </div>");
             }
         }
     };
@@ -448,12 +529,31 @@ function changeButtonClick(i, imdb_number, number) {
                 if (xhttp.status === 200) {
                     //The rating has been updated, so now reload the div with ratings and it should be there!
                     completeMyRatings();
-                } else {
-                    var errorResponse = JSON.parse(xhttp.responseText);
-                    var errorMessage = errorResponse.errorMessage;
-
-                    console.log(errorMessage)
-                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+                } else if (this.status === 400) {
+                    //This means something in the request body was wrong, which is most likely caused by programming issues
+                    // server-side. (Or the user found some way to intercept the request and alter it.)
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Error!</strong> " + response.errorMessage + " Please contact us and let us know what caused this issue." +
+                        "  </div>");
+                } else if (this.status === 403) {
+                    //This means the user was not authorized, meaning they had no token, or it expired.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Danger!</strong> " + response.errorMessage +
+                        "  </div>");
+                } else if (this.status === 404) {
+                    //This means that the user does not have a rating for this movie, so nothing can be edited.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Warning!</strong> " + response.errorMessage +
+                        "  </div>");
+                } else if (this.status === 500) {
+                    //This means something is going on server-side that the user can't do anything about.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Danger!</strong> " + response.errorMessage + " This most likely means that the website is being worked on. Please come back later!" +
+                        "  </div>");
                 }
             }
         };
@@ -484,15 +584,36 @@ function removeButtonClick(i, tt_number) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4) {
+                var response = JSON.parse(this.responseText);
+
                 if (this.status === 200) {
                     //Reload the page, so that the list resets all the counters and places the still existing items nicely.
                     completeMyRatings();
-                } else {
-                    var errorResponse = JSON.parse(this.responseText);
-                    var errorMessage = errorResponse.errorMessage;
-
-                    console.log(errorMessage)
-                    //TODO - YORAN: Let user know of the error that occured, and that their request didn't work.
+                } else if (this.status === 400) {
+                    //This means something in the request body was wrong, which is most likely caused by programming issues
+                    // server-side. (Or the user found some way to intercept the request and alter it.)
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Error!</strong> " + response.errorMessage + " Please contact us and let us know what caused this issue." +
+                        "  </div>");
+                } else if (this.status === 403) {
+                    //This means the user was not authorized, meaning they had no token, or it expired.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Danger!</strong> " + response.errorMessage +
+                        "  </div>");
+                } else if (this.status === 404) {
+                    //This means that the user does not have a rating for this movie, so nothing can be edited.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-warning alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Warning!</strong> " + response.errorMessage +
+                        "  </div>");
+                } else if (this.status === 500) {
+                    //This means something is going on server-side that the user can't do anything about.
+                    $("#ratingsListContainer").prepend("<div class=\"alert alert-danger alert-dismissable\">\n" +
+                        "    <a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>\n" +
+                        "    <strong>Danger!</strong> " + response.errorMessage + " This most likely means that the website is being worked on. Please come back later!" +
+                        "  </div>");
                 }
             }
         };

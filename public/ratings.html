@@ -1,6 +1,6 @@
 <div class="jumbotron">
     <div class="row">
-        <div class="container col-md-7">
+        <div id="ratingSearchContainer" class="container col-md-7">
             <h1 class="display-3">Your movie ratings</h1>
             <p>You are your own critic, which we appreciate. Here you'll find all the ratings you ever made.
                 Additionally,if you've judged a lot of shows and movies, you can search for specific ones. Or more
@@ -23,11 +23,11 @@
             </form>
             </p>
         </div>
-        <div class="container col-md-5">
+        <div id="ratingCreateContainer" class="container col-md-5">
             <h1 class="display-3">Rate even more!</h1>
             <p>Let the rest of the world know what you thought about a particular movie!</p>
             <p>
-            <form name="ratingCreationForm" method="post" onsubmit="return getMovieFakeTT()">
+            <form name="ratingCreationForm" onsubmit="return getMovieFakeTT()">
                 <div class="form-group">
                     <label for="ratingMovieBox">Rated movie TT number:</label>
                     <div class="input-group mr-sm-2 col-md-5">
@@ -45,14 +45,14 @@
                            aria-label="RatingScoreBox" value="2.5" min="0.0" max="5.0" step="0.5" required>
                     <span class="help-block text-muted">Scores must be between 0.0 and 5.0 inclusive and in increments of X.0 or X.5</span>
                 </div>
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Post</button>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Post rating</button>
             </form>
             </p>
         </div>
     </div>
 </div>
 
-<div class="container">
+<div id="ratingsListContainer" class="container">
     <!-- Example row of columns -->
     <div id="ratingRow" class="row">
 
