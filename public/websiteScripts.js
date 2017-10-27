@@ -1,7 +1,7 @@
-if(localStorage.getItem("authorization") !== null) {
+if (localStorage.getItem("authorization") !== null) {
     //Check if the browser still has a valid token stored, if so, just log them into the user from that token.
     var data = {
-        "token":localStorage.getItem("authorization")
+        "token": localStorage.getItem("authorization")
     };
 
     var xhttp = new XMLHttpRequest();
@@ -121,21 +121,21 @@ function formFunction() {
             response = JSON.parse(this.responseText);
             movies(response.docs);
             addButtons(response.total, function () {
-                newFunction(searchCategory+"="+searchQuery)
+                newFunction(searchCategory + "=" + searchQuery)
             });
         }
     };
     if (searchCategory === "Title") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?title=" + searchQuery+"&pag=0", true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?title=" + searchQuery + "&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "Director") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?director=" + searchQuery+"&pag=0", true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?director=" + searchQuery + "&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "Description") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?description=" + searchQuery+"&pag=0", true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?description=" + searchQuery + "&pag=0", true);
         // xhttp.send();
     } else if (searchCategory === "tt_number") {
-        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + searchQuery+"&pag=0", true);
+        xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=" + searchQuery + "&pag=0", true);
         // xhttp.send();
     }
     xhttp.send();
@@ -247,51 +247,16 @@ function ratingSearchFormFunction() {
     return false;
 }
 
-function ratingCreateFormFunction() {
+function getMovieFakeTT() {
     var givenTTNumber = $("#ratingMovieBox").val();
-    var givenScore = $("#ratingScoreBox").val();
-    var data = {};
-
-    var userToken = localStorage.getItem("authorization");
 
     var xhttp = new XMLHttpRequest();
-    var secondxhttp = new XMLHttpRequest();
-
-    //TODO: Make this work.
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             if (this.status === 200) {
-                //Find the movie with the given TT number, to gets its internal database TT number, as we need both that one and the official IMDB TT number to make a rating.
-                var firstResponse = JSON.parse(this.responseText);
+                var response = JSON.parse(this.responseText);
 
-                var databaseTTNumber = firstResponse.tt_number;
-
-                data = {
-                    "imdb_tt_number": "tt" + givenTTNumber,
-                    "tt_number": databaseTTNumber,
-                    "rating": givenScore
-                };
-
-                secondxhttp.onreadystatechange = function () {
-                    if (secondxhttp.readyState === 4) {
-                        if (secondxhttp.status === 201) {
-                            //The rating has been created, so now reload the div with ratings and it should be there!
-                            completeMyRatings();
-                        } else {
-                            var errorResponse = JSON.parse(secondxhttp.responseText);
-                            var errorMessage = errorResponse.errorMessage;
-
-                            console.log(errorMessage)
-                            //TODO: Error handling
-                        }
-                    }
-                };
-
-                console.log(data);
-
-                secondxhttp.open("POST", "http://localhost:3000/api/ratings/", true);
-                secondxhttp.setRequestHeader('authorization', userToken);
-                secondxhttp.send(JSON.stringify(data));
+                ratingCreateFormFunction(response.docs[0].tt_number);
             } else {
                 var firstErrorResponse = JSON.parse(this.responseText);
                 var errorMessage = firstErrorResponse.errorMessage;
@@ -301,8 +266,49 @@ function ratingCreateFormFunction() {
             }
         }
     };
+
     xhttp.open("GET", "http://localhost:3000/api/movies/?ttnumber=tt" + givenTTNumber + "&pag=0", true);
     xhttp.send();
+
+    return false;
+}
+
+function ratingCreateFormFunction(databaseTTNumber) {
+    var givenTTNumber = $("#ratingMovieBox").val();
+    var givenScore = $("#ratingScoreBox").val();
+
+    var userToken = localStorage.getItem("authorization");
+
+    var data = {
+        "imdb_tt_number": "tt" + givenTTNumber,
+        "tt_number": databaseTTNumber,
+        "rating": givenScore
+    };
+
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState === 4) {
+            //Remove the temporarily stored fake TT number just to be sure.
+            localStorage.removeItem("temporaryTT");
+
+            if (xhttp.status === 201) {
+                //The rating has been created, so now reload the div with ratings and it should be there!
+                completeMyRatings();
+            } else {
+                var errorResponse = JSON.parse(xhttp.responseText);
+                var errorMessage = errorResponse.errorMessage;
+
+                console.log(errorMessage)
+                //TODO: Error handling
+            }
+        }
+    };
+
+    xhttp.open("POST", "http://localhost:3000/api/ratings/", true);
+    xhttp.setRequestHeader('authorization', userToken);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(data));
 
     return false;
 }
@@ -346,12 +352,12 @@ function ratings(response) {
 
         var newIn = "<div class=\"col-md-4\">\n" +
             "            <div class=\"card\" style=\"width: 20rem;\">" +
-            "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i+1) + "</h4>\n" +
+            "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i + 1) + "</h4>\n" +
             "                <div class=\"card-body\">\n" +
             "                    <h5 class=\"card-title\">Movie TT number: " + imdb_number + "</h5>\n" +
             "                    <p class=\"card-text\">Your rating: " + response[i].rating + "</p>\n" +
-            "                    <a id=\"ChangeRating"+i+"\" class=\"btn btn-info\">Edit</a>\n" +
-            "                    <a id=\"RemoveRating"+i+"\" class=\"btn btn-danger\">Remove</a>\n" +
+            "                    <a id=\"ChangeRating" + i + "\" class=\"btn btn-info\">Edit</a>\n" +
+            "                    <a id=\"RemoveRating" + i + "\" class=\"btn btn-danger\">Remove</a>\n" +
             "                </div>\n" +
             "                <a class=\"card-footer text-muted\">Date: " + response[i].date + "</a>\n" +
             "            </div>\n" +
@@ -370,7 +376,7 @@ function removeButtonClick(i, tt_number) {
 
     var url = "http://localhost:3000/api/ratings/" + username + "/" + tt_number;
 
-    $("#RemoveRating"+i).click(function () {
+    $("#RemoveRating" + i).click(function () {
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -396,22 +402,22 @@ function removeButtonClick(i, tt_number) {
 function getIMG(tt_number, title) {
     var movie;
     var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             movie = JSON.parse(this.responseText);
             var posterPath = movie.poster_path;
             var ulrString = 'https://image.tmdb.org/t/p/w500' + posterPath;
-            localStorage.setItem(''+title+'', ulrString);
+            localStorage.setItem('' + title + '', ulrString);
         }
     };
-    xhr.open("GET", "https://api.themoviedb.org/3/movie/"+tt_number+"?api_key=af1b95e9f890b9b6840cf6f08d0e6710&language=en-US", true);
+    xhr.open("GET", "https://api.themoviedb.org/3/movie/" + tt_number + "?api_key=af1b95e9f890b9b6840cf6f08d0e6710&language=en-US", true);
     xhr.send();
 }
 
 function searchUser() {
     var firstname = document.forms["searchFormUser"]["searchQuery"].value;
     $("#usersGrid").empty();
-    getUsers('user/'+firstname+'');
+    getUsers('user/' + firstname + '');
     return false;
 }
 
@@ -427,14 +433,14 @@ function getUsers(search) {
             if (this.readyState === 4 && this.status === 200) {
                 var response = JSON.parse(this.responseText);
 
-                for (var i = 0 ; i < response.length ; i++){
+                for (var i = 0; i < response.length; i++) {
                     var x = Math.floor((Math.random() * 7));
                     var newIn = " <div class=\"col-lg-4\">\n" +
-                        "                    <div class=\"card text-white bg-"+colors[x]+" mb-3\" style=\"max-width: 20rem;\">\n" +
-                        "                        <div class=\"card-header\">"+response[i].username+"</div>\n" +
+                        "                    <div class=\"card text-white bg-" + colors[x] + " mb-3\" style=\"max-width: 20rem;\">\n" +
+                        "                        <div class=\"card-header\">" + response[i].username + "</div>\n" +
                         "                        <div class=\"card-body\">\n" +
-                        "                            <h4 class=\"card-title\">"+response[i].first_name+ ' ' +response[i].middle_name+ ' ' +response[i].last_name+"</h4>\n" +
-                        "                            <p class=\"card-text\">Favourites: "+response[i].favourites+"</p>\n" +
+                        "                            <h4 class=\"card-title\">" + response[i].first_name + ' ' + response[i].middle_name + ' ' + response[i].last_name + "</h4>\n" +
+                        "                            <p class=\"card-text\">Favourites: " + response[i].favourites + "</p>\n" +
                         "                        </div>\n" +
                         "                    </div>\n" +
                         "                </div>";
@@ -442,10 +448,10 @@ function getUsers(search) {
                 }
             }
         };
-        if (search === undefined){
+        if (search === undefined) {
             xhttp.open("GET", "http://localhost:3000/api/users/", true);
         } else {
-            xhttp.open("GET", "http://localhost:3000/api/users/"+search, true);
+            xhttp.open("GET", "http://localhost:3000/api/users/" + search, true);
         }
         xhttp.setRequestHeader("authorization", token);
         xhttp.send(token);
@@ -454,7 +460,7 @@ function getUsers(search) {
 
 function buttonClick(i, title) {
     var token = localStorage.getItem('authorization');
-    $("#"+i).click(function () {
+    $("#" + i).click(function () {
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -462,14 +468,14 @@ function buttonClick(i, title) {
                 window(alert(title + " has been added to your favourites list.\nCurrent list: " + JSON.parse(this.responseText).favourites));
             }
         };
-        xhttp.open("PUT", "http://localhost:3000/api/users/favourites/"+title, true);
+        xhttp.open("PUT", "http://localhost:3000/api/users/favourites/" + title, true);
         xhttp.setRequestHeader("authorization", token);
         xhttp.send();
     });
 }
 
 //Function to bind buttons for pagination.
-function  newFunction(query) {
+function newFunction(query) {
     $(".page-item").off();
     $(".page-item").click(function () {
         $("#movieRow").empty();
@@ -480,11 +486,11 @@ function  newFunction(query) {
                 movies(response.docs);
             }
         };
-        if (query !== undefined){
+        if (query !== undefined) {
             var str = query.toLowerCase();
-            xhttp.open("GET", "http://localhost:3000/api/movies/?"+str+"&pag="+($(this).text()), true);
-        }else {
-            xhttp.open("GET", "http://localhost:3000/api/movies/?pag="+($(this).text()), true);
+            xhttp.open("GET", "http://localhost:3000/api/movies/?" + str + "&pag=" + ($(this).text()), true);
+        } else {
+            xhttp.open("GET", "http://localhost:3000/api/movies/?pag=" + ($(this).text()), true);
         }
 
         xhttp.send();
@@ -496,7 +502,7 @@ function getAllImages() {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             var response = JSON.parse(this.responseText);
-            for (var i = 0 ; i < response.length ; i++){
+            for (var i = 0; i < response.length; i++) {
                 var number = response[i].imdb_tt_number;
                 var title = response[i].title;
                 getIMG(number, title);
@@ -522,7 +528,7 @@ function movies(response) {
             "                <div class=\"card-body\">\n" +
             "                    <h5 class=\"card-title\">" + response[i].director + "</h5>\n" +
             "                    <p class=\"card-text\">" + response[i].description + "</p>\n" +
-            "                    <a id=\""+i+"\" class=\"btn btn-primary\">Favourite</a>\n" +
+            "                    <a id=\"" + i + "\" class=\"btn btn-primary\">Favourite</a>\n" +
             "                </div>\n" +
             "                <a class=\"card-footer text-muted\">Movie TT: " + number + "</a>\n" +
             "            </div>\n" +
@@ -536,11 +542,12 @@ function movies(response) {
 function addButtons(number, callback) {
     $(".pagination").empty();
     var int = 0;
-    while (number > 0){
-        $(".pagination").append(" <li class=\"page-item\"><a class=\"page-link\" href=\"#\">"+int+"</a></li>");
-        int = int +1;
-        number = number-3;
+    while (number > 0) {
+        $(".pagination").append(" <li class=\"page-item\"><a class=\"page-link\" href=\"#\">" + int + "</a></li>");
+        int = int + 1;
+        number = number - 3;
     }
     callback();
 }
+
 //...

@@ -283,7 +283,7 @@ router.use(function (req, res, next) {
         }
     } else {
         res.status(400);
-        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly). Should be giventt_number: & givenRating: (both as numbers only).'})
+        res.json({errorMessage: '400 BAD REQUEST - You are not defining certain required data (correctly). Should be tt_number: & rating: (both as numbers only).'})
     }
 });
 
