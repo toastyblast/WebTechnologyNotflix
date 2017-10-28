@@ -18,93 +18,132 @@ describe("Movies unit tests", function () {
 //
     /* -=- All tests for the GET /api/movies/:tt_number routing -=- */
     it("Should return a movie with the given tt_number", function (done) {
-        server.get("/api/movies/?ttnumber= 123") //Add existing movie number.
+        server.get("/api/movies/?ttnumber=tt1663662") //Add existing movie number.
             .expect("Content-type", /json/)
             .expect(200, {
-                "Movies": [
+                "docs": [
                     {
-                        "tt_number": 123,
-                        "title": "The Lego Movie",
-                        "date": "2015-04-26T00:00:00.000Z",
-                        "director": "Leg Godt",
-                        "description": "Tapping into that nostalgia mine!"
+                        "_id": "59f45db3c8ab28084c0ea35d",
+                        "imdb_tt_number": "tt1663662",
+                        "tt_number": 789,
+                        "title": "Pacific Rim",
+                        "publication_date": "2013-11-12T00:00:00.000Z",
+                        "length_min": 91,
+                        "director": "Guillermo del Toro  ",
+                        "description": "As a war between humankind and monstrous sea creatures wages on, a former pilot and a trainee are paired up to drive a seemingly obsolete special weapon in a desperate effort to save the world from the apocalypse. ",
+                        "__v": 0
                     }
-                ]
+                ],
+                "total": 1,
+                "limit": 3,
+                "offset": 0
             }, done);
     });
 //
     it("Should return a 404 NOT FOUND error due to non-existant tt_number", function (done) {
         server.get("/api/movies/?ttnumber=1234")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
+            .expect(404, '"Movie could not be found"', done);
     });
 //
     /* -=- All tests for the GET /api/movies/:title routing -=- */
     it("Should return a movie with the given title", function (done) {
-        server.get("/api/movies/?title=le") //Add existing move title.
+        server.get("/api/movies/?title=hard") //Add existing move title.
             .expect("Content-type", /json/)
             .expect(200, {
-                "Movies": [
+                "docs": [
                     {
-                        "tt_number": 123,
-                        "title": "The Lego Movie",
-                        "date": "2015-04-26T00:00:00.000Z",
-                        "director": "Leg Godt",
-                        "description": "Tapping into that nostalgia mine!"
+                        "_id": "59f45db3c8ab28084c0ea35c",
+                        "imdb_tt_number": "tt0095016",
+                        "tt_number": 456,
+                        "title": "Die Hard",
+                        "publication_date": "1988-08-20T00:00:00.000Z",
+                        "length_min": 97,
+                        "director": "John McTiernan",
+                        "description": "John McClane, officer of the NYPD, tries to save his wife Holly Gennaro and several others that were taken hostage by German terrorist Hans Gruber during a Christmas party at the Nakatomi Plaza in Los Angeles. ",
+                        "__v": 0
                     }
-                ]
+                ],
+                "total": 1,
+                "limit": 3,
+                "offset": null
             }, done);
     });
 //
     it("Should return a 404 NOT FOUND as the movie with the given title does not exist", function (done) {
         server.get("/api/movies/?title=MovieTitleThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
+            .expect(404, '"Movie could not be found"', done);
     });
 //
     /* -=- All tests for the GET /api/movies/:director routing -=- */
     it("Should return a movie with the given director", function (done) {
-        server.get("/api/movies/?director=mi") //Add existing director.
+        server.get("/api/movies/?director=tim") //Add existing director.
             .expect("Content-type", /json/)
             .expect(200, {
-                "Movies": [
+                "docs": [
                     {
-                        "tt_number": 456,
-                        "title": "Die Hard 291",
-                        "date": "2101-08-02T00:00:00.000Z",
-                        "director": "Michael Bay",
-                        "description": "Nobody wants to see this anymore, oh god let it stop."
+                        "_id": "59f45db3c8ab28084c0ea360",
+                        "imdb_tt_number": "tt1431045",
+                        "tt_number": 226,
+                        "title": "Deadpool",
+                        "publication_date": "2013-11-12T00:00:00.000Z",
+                        "length_min": 91,
+                        "director": " Tim Miller ",
+                        "description": "A fast-talking mercenary with a morbid sense of humor is subjected to a rogue experiment that leaves him with accelerated healing powers and a quest for revenge. ",
+                        "__v": 0
                     }
-                ]
+                ],
+                "total": 1,
+                "limit": 3,
+                "offset": null
             }, done);
     });
 //
     it("Should return a 404 NOT FOUND as the movie with the given director does not exist", function (done) {
         server.get("/api/movies/?director=DirectorThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
+            .expect(404, '"Movie could not be found"', done);
     });
 
     it("Should return a movie with the given description", function (done) {
-        server.get("/api/movies/?description=stop")
+        server.get("/api/movies/?description=evil")
             .expect("Content-type", /json/)
             .expect(200, {
-                "Movies": [
+                "docs": [
                     {
-                        "tt_number": 456,
-                        "title": "Die Hard 291",
-                        "date": "2101-08-02T00:00:00.000Z",
-                        "director": "Michael Bay",
-                        "description": "Nobody wants to see this anymore, oh god let it stop."
+                        "_id": "59f45db3c8ab28084c0ea361",
+                        "imdb_tt_number": "tt0472181",
+                        "tt_number": 225,
+                        "title": "The Smurfs",
+                        "publication_date": "2013-11-12T00:00:00.000Z",
+                        "length_min": 91,
+                        "director": " Raja Gosnell",
+                        "description": "When the evil wizard Gargamel chases the tiny blue Smurfs out of their village, they tumble from their magical world into New York City. ",
+                        "__v": 0
+                    },
+                    {
+                        "_id": "59f45db3c8ab28084c0ea35b",
+                        "imdb_tt_number": "tt1490017",
+                        "tt_number": 123,
+                        "title": "The Lego Movie",
+                        "publication_date": "2014-04-07T00:00:00.000Z",
+                        "length_min": 94,
+                        "director": "Christopher Miller",
+                        "description": "An ordinary Lego construction worker, thought to be the prophesied 'Special', is recruited to join a quest to stop an evil tyrant from gluing the Lego universe into eternal stasis. ",
+                        "__v": 0
                     }
-                ]
+                ],
+                "total": 2,
+                "limit": 3,
+                "offset": null
             }, done);
     });
 
     it("Should return a 404 NOT FOUND as the movie with the given description does not exist", function (done) {
         server.get("/api/movies/?description=DescriptionThatDoesntExist")
             .expect("Content-type", /json/)
-            .expect(404, '"Sorry we could not find a movie that matches your search."', done);
+            .expect(404, '"Movie could not be found"', done);
     });
 
 });
@@ -165,7 +204,7 @@ describe("Users unit tests", function () {
 
     it("Should return all users in the system (without password)", function (done) {
         server.get("/api/users")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(200, done);
         mongoose.connection.close();
@@ -180,7 +219,7 @@ describe("Users unit tests", function () {
 
     it("Should return a specific user (without password) with the given username", function (done) {
         server.get("/api/users/user/skellyton")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(200, [
                 {
@@ -196,21 +235,21 @@ describe("Users unit tests", function () {
 
     it("Should return a 404 NOT FOUND as the user with the given username could not be found", function (done) {
         server.get("/api/users/user/UniqueUser3")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });
 
     it("Should return a list with the amount of users that was specified", function (done) {
         server.get("/api/users/2")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(200, done);
     });
 
     it("Should return 400 BAD REQUEST because the value that was passed was not a number", function (done) {
         server.get("/api/users/a")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(400, done);
     });
@@ -223,7 +262,7 @@ describe("Users unit tests", function () {
 
     it("Should add a movie to the favorites of the user", function (done) {
         server.put("/api/users/favourites/The Lego Movie")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(function (res) {
                 res.body._id = '1';
@@ -244,7 +283,7 @@ describe("Users unit tests", function () {
 
     it("Should give ERROR 404 DOES NOT EXIST because you are trying to favorite a non-existing movie.", function (done) {
         server.put("/api/users/favourites/MovieThatDoesntExist")
-            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDgzODgxLCJleHAiOjE1MDgxNzAyODF9.kdpZqr6ZnmfEVK0SL1cGx4B1kNduv9P-KTQxYozsBOU"})
+            .set({"authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA5MTg3NTQzLCJleHAiOjE1MTE2MDY3NDN9.Yk6Rk-8l5dGARr699DN29Q5_MB4ZdSOY-c0hDsHS05Y"})
             .expect("Content-type", /json/)
             .expect(404, done);
     });

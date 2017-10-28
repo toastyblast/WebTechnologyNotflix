@@ -149,6 +149,12 @@ $(document).ready(function () {
     //More action functions here...
 });
 
+/**
+ * This function is executed when the search button on the movie's search form is clicked. When that happens the category
+ * of the search is retrieved from the drop down select menu. Depending on the search category one of 4 ajax requests is
+ * exectued(search by title/director/description/imdb tt_number).
+ * @returns {boolean}
+ */
 function formFunction() {
     var searchQuery = document.forms["searchForm"]["searchQuery"].value;
     var searchCategory = $("#exampleFormControlSelect1").val();
@@ -183,12 +189,12 @@ function formFunction() {
     return false;
 }
 
+/**
+ * This function is executed when the register button is clicked. When that happens a new form is loaded where the user
+ * can enter his/her name.
+ * @returns {boolean}
+ */
 function registerFunction() {
-    var username = document.forms["registerForm"]["username"].value;
-    var password = document.forms["registerForm"]["password"].value;
-    localStorage.setItem('username', username);
-    localStorage.setItem('password', password);
-
     $("#registerButton").hide();
 
     var eyy = "<form id='nameForm' name=\"registerFormNames\" class=\"form-inline my-2 my-lg-0\" method=\"post\" onsubmit=\"return completeFunction()\">\n" +
@@ -202,12 +208,18 @@ function registerFunction() {
     return false;
 }
 
+/**
+ * This function is executed when the complete registration button is clicked. When that happens the information from all
+ * input fields is retrieved and is send via the body of the ajax request. Depending on the outcome of the request different
+ * messages will be returned to the user, signaling success or if something went wrong.
+ * @returns {boolean}
+ */
 function completeFunction() {
     var firstname = document.forms["registerFormNames"]["firstname"].value;
     var middlename = document.forms["registerFormNames"]["middlename"].value;
     var lastname = document.forms["registerFormNames"]["lastname"].value;
-    var username = localStorage.getItem("username");
-    var password = localStorage.getItem("password");
+    var username = document.forms["registerForm"]["username"].value;
+    var password = document.forms["registerForm"]["password"].value;
 
     var data = {
         "lastname": "" + lastname,
@@ -623,6 +635,12 @@ function removeButtonClick(i, tt_number) {
     });
 }
 
+/**
+ * Function that makes an ajax request to the themoviedb api(for each movie). If the request is successful the poster URL
+ * that was recieved from the request is stored in the localStorage with the name of the movie being the key.
+ * @param tt_number IMDB tt_number of the movie.
+ * @param title Title of the movie.
+ */
 function getIMG(tt_number, title) {
     var movie;
     var xhr = new XMLHttpRequest();
@@ -638,6 +656,11 @@ function getIMG(tt_number, title) {
     xhr.send();
 }
 
+/**
+ * Function that gets the username query from the form on the users page, and after that passes the query to the ajax
+ * request(getUsers).
+ * @returns {boolean}
+ */
 function searchUser() {
     var firstname = document.forms["searchFormUser"]["searchQuery"].value;
     $("#usersGrid").empty();
@@ -645,6 +668,10 @@ function searchUser() {
     return false;
 }
 
+/**
+ * Function that gets all of the users, or if a query is specified retrieves that user.
+ * @param search A query param for individual user search.
+ */
 function getUsers(search) {
     var colors = ["primary", "secondary", "success", "danger", "warning", "info", "dark"];
     $(".jumbotron").hide();
@@ -672,6 +699,8 @@ function getUsers(search) {
                 }
             }
         };
+
+        //If there is no search query defined get all of the users. Else get a single user.
         if (search === undefined) {
             xhttp.open("GET", "http://localhost:3000/api/users/", true);
         } else {
@@ -682,6 +711,13 @@ function getUsers(search) {
     });
 }
 
+/**
+ * When film cards are loaded, every favourite button is assigned an unique id. After that each of these buttons is given
+ * an onclick which executes a ajax request that adds the movie that the button is assigned to, to the current user's favourite
+ * list.
+ * @param i ID of the button.
+ * @param title Title of the movie that the button is assigned to. (The button is part of that movies card.)
+ */
 function buttonClick(i, title) {
     var token = localStorage.getItem('authorization');
 
@@ -699,7 +735,15 @@ function buttonClick(i, title) {
     });
 }
 
-//Function to bind buttons for pagination.
+/**
+ * Function that is used for the pagination. After all of the pagination buttons have been loaded, this function assigns
+ * an on click listener to them. This on click sends a pagination ajax request with the offset parameter being the number of the
+ * pagination button.
+ * A page can have only 3 movies. Pages start from zero. (EX: If page number is 1, it will skip the first 3 movies, and show
+ * the next 3, if the number is 2 it will skip the first six movies and show the next three, if the number is 0, it will show
+ * the first three movies.)
+ * @param query
+ */
 function newFunction(query) {
     $(".page-item").off();
     $(".page-item").click(function () {
@@ -722,6 +766,10 @@ function newFunction(query) {
     })
 }
 
+/**
+ * Function that is executed when the website is READY. It uses the the movie db api(getIMG) to get posters for all of the movies,
+ * in the database, so other methods can use the posters when needed.
+ */
 function getAllImages() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -739,6 +787,10 @@ function getAllImages() {
     xhttp.send();
 }
 
+/**
+ * Function that loads the movies into the movieRow so the user can see them.
+ * @param response The response that is returned from the AJAX request containing a list of movies.
+ */
 function movies(response) {
     for (var i = 0; i < response.length; i++) {
         var number = response[i].imdb_tt_number;
@@ -787,6 +839,11 @@ function getRatingOfSpecificMovie(index, tt_number) {
     return false;
 }
 
+/**
+ * Function that adds a navigation page for each 3 movies. (If there are 9 movies it adds 3 pages).
+ * @param number Number of total movies.
+ * @param callback A callback.
+ */
 function addButtons(number, callback) {
     $(".pagination").empty();
     var int = 0;

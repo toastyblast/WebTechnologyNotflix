@@ -15,39 +15,78 @@ router.get('/', function (req, res) {
     if (req.query.title !== undefined) {
         //If the user search for a movie by a title, check each movie's title if it contains the query word.
         //If it does add it to the answer string and in the end print it.
-        Movie.paginate({ "title": { "$regex": ""+req.query.title+"", "$options": "i" } },{ offset: parseInt(req.query.pag)*3, limit: 3 }, function (err, movies) {
-            res.json(movies);
+        Movie.paginate({
+            "title": {
+                "$regex": "" + req.query.title + "",
+                "$options": "i"
+            }
+        }, {offset: parseInt(req.query.pag) * 3, limit: 3}, function (err, movies) {
+            if (movies.docs.length === 0) {
+                res.status(404);
+                res.json("Movie could not be found");
+            } else {
+                res.json(movies);
+
+            }
         });
     } else if (req.query.director !== undefined) {
         //If the user search for a movie by a director, check each movie's director if it contains the query word.
         //If it does add it to the answer string and in the end print it.
-        Movie.paginate({ "director": { "$regex": ""+req.query.director+"", "$options": "i" } },{ offset: parseInt(req.query.pag)*3, limit: 3 }, function (err, movies) {
-            res.json(movies);
+        Movie.paginate({
+            "director": {
+                "$regex": "" + req.query.director + "",
+                "$options": "i"
+            }
+        }, {offset: parseInt(req.query.pag) * 3, limit: 3}, function (err, movies) {
+            if (movies.docs.length === 0) {
+                res.status(404);
+                res.json("Movie could not be found");
+            } else {
+                res.json(movies);
+
+            }
         });
     } else if (req.query.description !== undefined) {
         //If the user search for a movie by a description, check each movie's description if it contains the query word.
         //If it does add it to the answer string and in the end print it.
-        Movie.paginate({ "description": { "$regex": ""+req.query.description+"", "$options": "i" } },{ offset: parseInt(req.query.pag)*3, limit: 3 }, function (err, movies) {
-            res.json(movies);
+        Movie.paginate({
+            "description": {
+                "$regex": "" + req.query.description + "",
+                "$options": "i"
+            }
+        }, {offset: parseInt(req.query.pag) * 3, limit: 3}, function (err, movies) {
+            if (movies.docs.length === 0) {
+                res.status(404);
+                res.json("Movie could not be found");
+            } else {
+                res.json(movies);
+
+            }
         });
     } else if (req.query.ttnumber !== undefined) {
         //If the user search for a movie by a tt_number, check each movie's tt_number if it equals the query number.
         //If it does add it to the answer string and in the end print it.
-        Movie.paginate({ "imdb_tt_number": req.query.ttnumber },{ offset: 0, limit: 3 }, function (err, movies) {
-            res.json(movies);
-        });
-    } else if (req.query.pag !== undefined){
+        Movie.paginate({"imdb_tt_number": req.query.ttnumber}, {offset: 0, limit: 3}, function (err, movies) {
+            if (movies.docs.length === 0) {
+                res.status(404);
+                res.json("Movie could not be found");
+            } else {
+                res.json(movies);
 
-            Movie.paginate({}, { offset: parseInt(req.query.pag)*3, limit: 3 }, function(err, result) {
-                // result.docs
-                // result.total
-                // result.limit - 10
-                // result.offset - 20
-                res.json(result);
-            });
+            }
+        });
+    } else if (req.query.pag !== undefined) {
+
+        Movie.paginate({}, {offset: parseInt(req.query.pag) * 3, limit: 3}, function (err, result) {
+            // result.docs
+            // result.total
+            // result.limit - 10
+            // result.offset - 20
+            res.json(result);
+        });
 
     } else {
-        Movie.paginate({}, { offset: 0, limit: 3 }, function(err, result) {
+        Movie.paginate({}, {offset: 0, limit: 3}, function (err, result) {
             // result.docs
             // result.total
             // result.limit - 10
