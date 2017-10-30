@@ -203,7 +203,7 @@ function registerFunction() {
         "    <input name=\"lastname\" class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"Last name\" aria-label=\"PasswordRegister\">\n" +
         "    <button class=\"btn btn-outline-success my-2 my-sm-0\" type=\"submit\">Complete Registration</button>\n" +
         "</form>";
-    $(".container").append(eyy);
+    $("#topContainer").append(eyy);
 
     return false;
 }
@@ -800,7 +800,7 @@ function movies(response) {
         var url = localStorage.getItem('' + title + '');
 
         var newIn = "<div class=\"col-md-4\">\n" +
-            "            <div class=\"card\" style=\"width: 20rem\">" +
+            "            <div class=\"card\" style=\"width: 20rem; min-height: 60rem\">" +
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">" + response[i].title + "</h4>\n" +
             "                <img class=\"card-img-top\" src=\"" + url + "\" alt=\"Could not find poster for this movie.\">\n" +
             "                <div class=\"card-body\">\n" +
