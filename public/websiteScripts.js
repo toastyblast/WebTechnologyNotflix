@@ -56,7 +56,7 @@ $(document).ready(function () {
     /**
      * Function triggered when the "Browse catalog" nav link has been clicked. Loads the page of all movies through several methods.
      */
-    $("#catalogButton").click(function () {
+    $("#catalogButton, #browse").click(function () {
         $(".jumbotron").hide();
         $(".container").hide();
         $("#result").load("movies.html", function () {
