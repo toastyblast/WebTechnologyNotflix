@@ -17,7 +17,7 @@ function searchMoviesFunction() {
             response = JSON.parse(this.responseText);
             movies(response.docs);
             addButtons(response.total, function () {
-                newFunction(searchCategory + "=" + searchQuery)
+                paginationButtonsOnClick(searchCategory + "=" + searchQuery)
             });
         }
     };

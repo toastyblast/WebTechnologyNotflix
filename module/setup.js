@@ -143,7 +143,7 @@ router.post('/', function (req, res) {
         var postFour = new Movie({
             imdb_tt_number : 'tt2488496',
             tt_number: 228,
-            title: "Star Wars: The Force Awakens ",
+            title: "Star Wars: The Force Awakens",
             publication_date: "2013-11-12",
             length_min: 91,
             director: " J.J. Abrams",
