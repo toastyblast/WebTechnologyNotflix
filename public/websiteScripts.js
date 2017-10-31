@@ -1,3 +1,6 @@
+//This JS holds any misc. functions that do not fit in any of the other JS documents. These mainly have to do with the
+// login/logout of the web client.
+
 /**
  * Special condition for the case of there being a user logged when the site is reloaded or accessed after it was closed. It makes sure that if the user didn't log out, then they stay logged in (if the token has not expired yet).
  */
@@ -11,6 +14,7 @@ if (localStorage.getItem("authorization") !== null) {
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             if (this.status === 200) {
+                //The stored token is still valid, thus we should re-login this user without requiring them to do so manually.
                 var response = JSON.parse(this.responseText);
                 var tokenUsername = response.tokenUsername;
                 localStorage.setItem("latestUserName", tokenUsername);
