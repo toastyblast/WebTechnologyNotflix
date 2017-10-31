@@ -1,3 +1,5 @@
+//This JS has the functions that deal with the ratings portion of the assignment.
+
 /**
  * Function that handles when the rating create button is clicked. Calls the database to create said ratings.
  *
@@ -19,6 +21,7 @@ function ratingCreateFormFunction(databaseTTNumber) {
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function () {
+        //Once your request is done...
         if (xhttp.readyState === 4) {
             var response = JSON.parse(this.responseText);
             //Remove the temporarily stored fake TT number just to be sure.
@@ -125,6 +128,7 @@ function ratings(response) {
         var imdb_number = response[i].imdb_tt_number;
         var number = response[i].tt_number;
 
+        //Create a new card for the rating item at the currend index and put it in the div.
         var newIn = "<div class=\"col-md-4\">\n" +
             "            <div class=\"card\" style=\"width: 20rem;\">" +
             "                <h4 id=\"" + i + "ab\" class=\"card-header\">Rating #" + (i + 1) + "</h4>\n" +
@@ -267,15 +271,27 @@ function removeButtonClick(i, tt_number) {
     });
 }
 
+/**
+ * Function that is not used on any of the rating pages, but instead on the catalog. It loads the avarage rating of a
+ * movie that is currently shown on said page.
+ *
+ * @param index is the index of the movie on the catalog page's movie grid container
+ * @param tt_number is the TT number of the movie that we want the average rating of.
+ * @returns {boolean} to prevent standard behaviour of any of the commands or forms found on the page.
+ */
 function getRatingOfSpecificMovie(index, tt_number) {
     var xhttp = new XMLHttpRequest();
+
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             if (this.status === 200) {
+                //This movie does have ratings, meaning it also has an average rating all users, even non-logged in
+                // ones, are allowed to see.
                 var response = JSON.parse(this.responseText);
 
                 $("#" + index).before("<p class=\"card-text\">Average rating: " + response.averageRating + "</p>\n");
             } else {
+                //The movie has no ratings yet, so there can't be any average ratings either.
                 $("#" + index).before("<p class=\"card-text\">Average rating: None yet!</p>\n");
             }
         }

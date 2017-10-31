@@ -145,8 +145,6 @@ $(document).ready(function () {
     $('#users').click(function () {
         getUsers();
     });
-
-    //More action functions here...
 });
 
 
