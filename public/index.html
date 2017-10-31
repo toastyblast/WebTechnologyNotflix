@@ -5,6 +5,7 @@
     <meta name="author" content="WT_Team_21">
     <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="websiteScripts.js"></script>
+    <script src="formFunctions.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
           integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="extraStyles.css" rel="stylesheet">
@@ -65,7 +66,7 @@
             and we of course have the rights to all movies and shows presented in our catalog! Now stop asking and enjoy
             the free content by registering now!</p>
         <p>
-        <form id="form" name="registerForm" class="form-inline my-2 my-lg-0" method="post" onsubmit="return registerFunction()">
+        <form id="form" name="registerForm" class="form-inline my-2 my-lg-0" method="post" onsubmit="return beginRegistrationFunction()">
             <input name="username" class="form-control mr-sm-2" type="text" placeholder="Unique username" aria-label="UsernameRegister">
             <input name="password" class="form-control mr-sm-2" type="password" placeholder="Password" aria-label="PasswordRegister">
             <button class="btn btn-outline-success my-2 my-sm-0" id="registerButton" type="submit">Register</button>
