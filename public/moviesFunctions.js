@@ -5,7 +5,7 @@
  */
 function addButtons(number, callback) {
     $(".pagination").empty();
-    var int = 1;
+    var int = 0;
     while (number > 0) {
         $(".pagination").append(" <li class=\"page-item\"><a class=\"page-link\" href=\"#\">" + int + "</a></li>");
         int = int + 1;
