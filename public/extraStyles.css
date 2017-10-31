@@ -27,8 +27,12 @@ body {
     color: lightgray;
 }
 
-#logout-button {
+#logout-button, #searchFormButton {
     margin-left: 14px;
+}
+
+#paginationList {
+    padding-bottom: 5px;
 }
 
 a.btn.btn-danger {

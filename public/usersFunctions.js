@@ -40,12 +40,13 @@ function getUsers(search) {
 
                 for (var i = 0; i < response.length; i++) {
                     var x = Math.floor((Math.random() * 7));
+
                     var newIn = " <div class=\"col-lg-4\">\n" +
                         "                    <div class=\"card text-white bg-" + colors[x] + " mb-3\" style=\"max-width: 20rem;\">\n" +
                         "                        <div class=\"card-header\">" + response[i].username + "</div>\n" +
                         "                        <div class=\"card-body\">\n" +
                         "                            <h4 class=\"card-title\">" + response[i].first_name + ' ' + response[i].middle_name + ' ' + response[i].last_name + "</h4>\n" +
-                        "                            <p class=\"card-text\">Favourites: " + response[i].favourites + "</p>\n" +
+                        "                            <p class=\"card-text\">Favourites: " + response[i].favourites.join(", ") + "</p>\n" +
                         "                        </div>\n" +
                         "                    </div>\n" +
                         "                </div>";
