@@ -20,10 +20,13 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given tt_number", function (done) {
         server.get("/api/movies/?ttnumber=tt1663662") //Add existing movie number.
             .expect("Content-type", /json/)
+            .expect(function(res) {
+                res.body.docs[0]._id = "1"
+            })
             .expect(200, {
                 "docs": [
                     {
-                        "_id": "59f45db3c8ab28084c0ea35d",
+                        "_id": "1",
                         "imdb_tt_number": "tt1663662",
                         "tt_number": 789,
                         "title": "Pacific Rim",
@@ -50,10 +53,13 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given title", function (done) {
         server.get("/api/movies/?title=hard") //Add existing move title.
             .expect("Content-type", /json/)
+            .expect(function(res) {
+                res.body.docs[0]._id = "1"
+            })
             .expect(200, {
                 "docs": [
                     {
-                        "_id": "59f45db3c8ab28084c0ea35c",
+                        "_id": "1",
                         "imdb_tt_number": "tt0095016",
                         "tt_number": 456,
                         "title": "Die Hard",
@@ -80,10 +86,13 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given director", function (done) {
         server.get("/api/movies/?director=tim") //Add existing director.
             .expect("Content-type", /json/)
+            .expect(function(res) {
+                res.body.docs[0]._id = "1"
+            })
             .expect(200, {
                 "docs": [
                     {
-                        "_id": "59f45db3c8ab28084c0ea360",
+                        "_id": "1",
                         "imdb_tt_number": "tt1431045",
                         "tt_number": 226,
                         "title": "Deadpool",
@@ -109,21 +118,14 @@ describe("Movies unit tests", function () {
     it("Should return a movie with the given description", function (done) {
         server.get("/api/movies/?description=evil")
             .expect("Content-type", /json/)
+            .expect(function(res) {
+                res.body.docs[0]._id = "1";
+                res.body.docs[1]._id = "2"
+            })
             .expect(200, {
                 "docs": [
                     {
-                        "_id": "59f45db3c8ab28084c0ea361",
-                        "imdb_tt_number": "tt0472181",
-                        "tt_number": 225,
-                        "title": "The Smurfs",
-                        "publication_date": "2013-11-12T00:00:00.000Z",
-                        "length_min": 91,
-                        "director": " Raja Gosnell",
-                        "description": "When the evil wizard Gargamel chases the tiny blue Smurfs out of their village, they tumble from their magical world into New York City. ",
-                        "__v": 0
-                    },
-                    {
-                        "_id": "59f45db3c8ab28084c0ea35b",
+                        "_id": "1",
                         "imdb_tt_number": "tt1490017",
                         "tt_number": 123,
                         "title": "The Lego Movie",
@@ -131,6 +133,17 @@ describe("Movies unit tests", function () {
                         "length_min": 94,
                         "director": "Christopher Miller",
                         "description": "An ordinary Lego construction worker, thought to be the prophesied 'Special', is recruited to join a quest to stop an evil tyrant from gluing the Lego universe into eternal stasis. ",
+                        "__v": 0
+                    },
+                    {
+                        "_id": "2",
+                        "imdb_tt_number": "tt0472181",
+                        "tt_number": 225,
+                        "title": "The Smurfs",
+                        "publication_date": "2013-11-12T00:00:00.000Z",
+                        "length_min": 91,
+                        "director": " Raja Gosnell",
+                        "description": "When the evil wizard Gargamel chases the tiny blue Smurfs out of their village, they tumble from their magical world into New York City. ",
                         "__v": 0
                     }
                 ],
@@ -342,7 +355,7 @@ describe("Authorization routing tests", function () {
     });
 });
 
-var correctAuthenticationCode = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA4MDc4NjEzLCJleHAiOjE1MTA0OTc4MTN9.aHsJeREumlkykoOtEhckC7DIZndVtRdVi6gnA6KOrZI'; //Auth token for toastyblast
+var correctAuthenticationCode = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvYXN0eWJsYXN0IiwiaWF0IjoxNTA5ODI0Nzc3LCJleHAiOjE1MTIyNDM5Nzd9.wbEc0OiBYlNEsKthKW0WqiTytRDCJI-pPFRHvB0D_w4'; //Auth token for toastyblast
 //THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
 
 describe("Ratings routings tests", function () {
@@ -383,7 +396,7 @@ describe("Ratings routings tests", function () {
     /* -=- All tests for the GET /api/ratings/:username routing & authorization integrity checks -=- */
     it("Should not show the ratings of a different user than the one logged in (400)", function (done) {
         server.get("/api/ratings/toastyblast")
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNzd3h5ejE3IiwiaWF0IjoxNTA4MDc5MTgwLCJleHAiOjE1MTA0OTgzODB9.NpJmhsbbMshdyp4i-G1UX4zlHxqAyM0Kz7qnB5xdh-4') //This is the auth token of sswxyz17, not toastyblast
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtpcGxpZXIiLCJpYXQiOjE1MDk4MjQ4MTAsImV4cCI6MTUxMjI0NDAxMH0.lGWwwdVDBj0E2B4y4-MjJHuyj_U-HxxJe7qymq82I2Q') //This is the auth token of markiplier, not toastyblast
             //THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
             .expect("Content-type", /json/)
             .expect("Content-Length", "104") //Exact length of the error message given when the token is wrong.
@@ -400,7 +413,7 @@ describe("Ratings routings tests", function () {
 
     it("Should return a 404 NOT FOUND if this user has no ratings", function (done) {
         server.get("/api/ratings/markiplier") //This user should have no ratings yet
-            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtpcGxpZXIiLCJpYXQiOjE1MDgwNzk0NzAsImV4cCI6MTUxMDQ5ODY3MH0.P3ZC1Xsh3Mh26m08pBVKa0UdPcx9ytSJ-AvQfj_jExk') //Auth token for markiplier
+            .set('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcmtpcGxpZXIiLCJpYXQiOjE1MDk4MjQ4MTAsImV4cCI6MTUxMjI0NDAxMH0.lGWwwdVDBj0E2B4y4-MjJHuyj_U-HxxJe7qymq82I2Q') //Auth token for markiplier
             //THIS TOKEN IS VALID UNTIL SUNDAY THE 12TH OF NOVEMBER 2017
             .expect("Content-type", /json/)
             .expect('Content-Length', '72') //Length of the correct code.
@@ -424,7 +437,7 @@ describe("Ratings routings tests", function () {
     });
 
     it("Should let the user know when they do not have a rating for that specific movie tt_number (404)", function (done) {
-        server.get("/api/ratings/toastyblast/tt4649466") //Different user than the token holder.
+        server.get("/api/ratings/toastyblast/tt1386697") //Different user than the token holder.
             .set('authorization', correctAuthenticationCode) //Auth token for toastyblast
             .expect("Content-type", /json/)
             .expect('Content-Length', '121') //Length of the appropriate error message.
